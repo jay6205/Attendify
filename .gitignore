@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Environment
+.env
+
+Attendify_PRD.md
