@@ -8,9 +8,19 @@ const userSchema = new mongoose.Schema({
         trim: true,
         lowercase: true
     },
+    name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
     passwordHash: {
         type: String,
-        required: true
+        required: false // Optional for Google Auth users
     },
     attendanceRequirement: {
         type: Number,

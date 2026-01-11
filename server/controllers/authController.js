@@ -3,7 +3,8 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 
 // Generate JWT
-const generateToken = (id) => {
+// Generate JWT
+export const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: '30d',
     });
@@ -132,4 +133,12 @@ export const logoutUser = async (req, res) => {
     // In a stateless JWT system, the server doesn't 'delete' the token unless using a blacklist (Redis).
     // For now, we just respond success, and the client deletes the token.
     res.status(200).json({ message: 'Logged out successfully' });
+};
+
+// @desc    Google Auth Callback
+// @route   GET /api/v1/auth/google/callback
+// @access  Public
+export const googleAuthCallback = (req, res) => {
+    const token = generateToken(req.user._id);
+    res.redirect(`http://localhost:5173/auth/success?token=${token}`);
 };

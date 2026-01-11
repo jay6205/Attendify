@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
+import './config/passport.js'; // Passport config
 
 // Load env vars
 dotenv.config();

@@ -7,6 +7,7 @@ import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AuthSuccess from './pages/AuthSuccess';
 
 import AIAdvisor from './pages/AIAdvisor';
 
@@ -31,6 +32,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/auth/success" element={<AuthSuccess />} />
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
