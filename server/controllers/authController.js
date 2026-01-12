@@ -2,7 +2,14 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 
-// Generate JWT
+const isProd = process.env.NODE_ENV === 'production';
+
+const cookieOptions = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+};
+
 // Generate JWT
 export const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -104,7 +111,7 @@ export const forgotPassword = async (req, res) => {
 
     // Mock reset token
     const resetToken = 'mock-reset-token-' + Date.now();
-    console.log(`\n[MOCK EMAIL] Reset Link for ${email}: http://localhost:5173/reset-password/${resetToken}\n`);
+    console.log(`\n[MOCK EMAIL] Reset Link for ${email}: ${process.env.CLIENT_URL}/reset-password/${resetToken}\n`);
 
     res.status(200).json({ message: 'Email sent (Check server console)' });
 };
@@ -140,5 +147,5 @@ export const logoutUser = async (req, res) => {
 // @access  Public
 export const googleAuthCallback = (req, res) => {
     const token = generateToken(req.user._id);
-    res.redirect(`http://localhost:5173/auth/success?token=${token}`);
+    res.redirect(`${process.env.CLIENT_URL}/auth/success?token=${token}`);
 };

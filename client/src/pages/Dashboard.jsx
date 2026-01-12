@@ -32,7 +32,12 @@ const Dashboard = () => {
     const fetchSubjects = async () => {
         try {
             const res = await api.get('/subjects');
-            setSubjects(res.data);
+            if (Array.isArray(res.data)) {
+                setSubjects(res.data);
+            } else {
+                console.error("API Error: Expected array, got", typeof res.data, res.data);
+                setSubjects([]);
+            }
         } catch (error) {
             console.error("Error fetching subjects:", error);
         } finally {

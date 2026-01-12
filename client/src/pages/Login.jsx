@@ -82,7 +82,7 @@ const Login = () => {
                 </div>
 
                 <a 
-                    href="http://localhost:5000/api/v1/auth/google"
+                    href={`${import.meta.env.VITE_API_URL}/auth/google`}
                     className="w-full bg-slate-100 hover:bg-white text-slate-900 font-medium py-3 rounded-lg transition-all flex items-center justify-center gap-3 group"
                 >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
