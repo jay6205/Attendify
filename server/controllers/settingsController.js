@@ -2,6 +2,7 @@ import User from '../models/User.js';
 import Subject from '../models/Subject.js';
 import TimetableEntry from '../models/TimetableEntry.js';
 import AttendanceLog from '../models/AttendanceLog.js';
+import ChatHistory from '../models/ChatHistory.js';
 
 // @desc    Get user settings
 // @route   GET /api/v1/settings
@@ -62,6 +63,7 @@ export const resetData = async (req, res) => {
         await Subject.deleteMany({ userId });
         await TimetableEntry.deleteMany({ userId });
         await AttendanceLog.deleteMany({ userId });
+        await ChatHistory.deleteMany({ userId });
 
         res.status(200).json({ message: 'Semester data cleared successfully.' });
     } catch (error) {
