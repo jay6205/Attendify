@@ -2,6 +2,8 @@
 import Subject from '../models/Subject.js';
 import AttendanceLog from '../models/AttendanceLog.js';
 import TimetableEntry from '../models/TimetableEntry.js';
+import fs from 'fs';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // ... existing code ...
 
@@ -22,16 +24,16 @@ export const deleteEntry = async (req, res) => {
         // CASCADE DELETE: Requirement is to remove EVERYTHING if a class is deleted
         // 1. Delete the Subject
         await Subject.findByIdAndDelete(subjectId);
-        
+
         // 2. Delete All Attendance Logs for this subject
         await AttendanceLog.deleteMany({ subjectId: subjectId });
 
         // 3. Delete All Timetable Entries for this subject (including this one)
         await TimetableEntry.deleteMany({ subjectId: subjectId });
 
-        res.status(200).json({ 
-            id: req.params.id, 
-            message: 'Subject and all associated data deleted successfully' 
+        res.status(200).json({
+            id: req.params.id,
+            message: 'Subject and all associated data deleted successfully'
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -117,7 +119,7 @@ export const getTimetable = async (req, res) => {
     try {
         const entries = await TimetableEntry.find({ userId: req.user.id })
             .populate('subjectId', 'name type');
-            
+
         // 1. Filter out orphan entries (where subject was deleted)
         const validEntries = entries.filter(entry => entry.subjectId != null);
 
@@ -143,15 +145,15 @@ export const getTimetable = async (req, res) => {
             groupedSchedule[day].sort((a, b) => a.startTime.localeCompare(b.startTime));
         }
 
-        res.status(200).json({ 
+        res.status(200).json({
             success: true,
             count: validEntries.length,
-            days: groupedSchedule 
+            days: groupedSchedule
         });
     } catch (error) {
         console.error("Get Timetable Error:", error);
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             message: "Server Error: Could not fetch timetable",
             days: {}
         });
@@ -194,9 +196,9 @@ export const bulkAddEntries = async (req, res) => {
             // 1. Find or Create Subject
             let subjectName = entry.subject ? entry.subject.trim() : 'Unknown';
             // Case-insensitive search
-            let subject = await Subject.findOne({ 
-                userId: req.user.id, 
-                name: { $regex: new RegExp(`^${subjectName}$`, 'i') } 
+            let subject = await Subject.findOne({
+                userId: req.user.id,
+                name: { $regex: new RegExp(`^${subjectName}$`, 'i') }
             });
 
             if (!subject) {
