@@ -24,7 +24,7 @@ api.interceptors.response.use(
             // Token expired or invalid
             localStorage.removeItem('token');
             if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-                window.location.href = '/login';
+                window.location.href = '/';
             }
         }
         return Promise.reject(error);
