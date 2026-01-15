@@ -54,8 +54,6 @@ export const uploadTimetable = async (req, res) => {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        // Using gemini-1.5-flash as it is fast and supports multimodal (text+images)
-        // If this 404s for you, try 'gemini-pro-vision' (legacy)
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         // Convert file to base64

@@ -2,7 +2,7 @@
 
 Attendify is an AI-powered student attendance management system built using the MERN stack. It helps students track attendance, calculate safe bunks, extract timetables via OCR, and gain actionable academic insights through an intelligent assistant.
 
-
+Demo Link:https://attendify-roan.vercel.app/
 ---
 
 ## Features
