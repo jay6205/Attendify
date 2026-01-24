@@ -3,10 +3,6 @@ import TimetableEntry from '../models/TimetableEntry.js';
 import AttendanceLog from '../models/AttendanceLog.js';
 import { calculateCurrentPercentage, getSafeBunks, getRequiredClasses } from '../utils/bunkCalculator.js';
 
-// ... existing imports ...
-
-// ... existing functions ...
-
 // @desc    Get all subjects
 // @access  Private
 export const getSubjects = async (req, res) => {
