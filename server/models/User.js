@@ -1,6 +1,12 @@
+
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true
+    },
     email: {
         type: String,
         required: true,
@@ -8,25 +14,31 @@ const userSchema = new mongoose.Schema({
         trim: true,
         lowercase: true
     },
-    name: {
+    passwordHash: {
         type: String,
-        required: true,
-        trim: true
+        required: function() { return !this.googleId; } // Required if not using Google Auth
     },
     googleId: {
         type: String,
         unique: true,
         sparse: true
     },
-    passwordHash: {
+    role: {
         type: String,
-        required: false // Optional for Google Auth users
+        enum: ['admin', 'teacher', 'student'],
+        default: 'student', // Default to student if not specified, though usually should be explicit
+        required: true
     },
-    attendanceRequirement: {
-        type: Number,
-        default: 75,
-        min: 0,
-        max: 100
+    // Flexible container for role-specific details
+    details: {
+        // Teacher specific
+        department: { type: String },
+        qualification: { type: String },
+        
+        // Student specific
+        studentId: { type: String, unique: true, sparse: true, trim: true },
+        batch: { type: String }, // e.g. "2023-2027"
+        currentSemester: { type: Number },
     },
     createdAt: {
         type: Date,

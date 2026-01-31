@@ -1,3 +1,4 @@
+
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -7,7 +8,6 @@ import './config/passport.js'; // Passport config
 // Load env vars
 dotenv.config();
 
-// Connect to database
 // Connect to database
 connectDB();
 
@@ -27,28 +27,25 @@ app.use(cors({
     credentials: true
 }));
 
-// Route files
+// Route files (V2)
 import authRoutes from './routes/authRoutes.js';
-import subjectRoutes from './routes/subjectRoutes.js';
-import timetableRoutes from './routes/timetable.js';
+import adminRoutes from './routes/adminRoutes.js';
+import academicRoutes from './routes/academicRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
-import analyticsRoutes from './routes/analyticsRoutes.js';
-import aiRoutes from './routes/aiRoutes.js';
-import settingsRoutes from './routes/settingsRoutes.js';
+import leaveRoutes from './routes/leaveRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 
 // Mount routers
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/subjects', subjectRoutes);
-app.use('/api/v1/timetable', timetableRoutes);
-app.use('/api/v1/attendance', attendanceRoutes);
-app.use('/api/v1/analytics', analyticsRoutes);
-app.use('/api/v1/ai', aiRoutes);
-app.use('/api/v1/settings', settingsRoutes);
-app.use('/api/v1/health', healthRoutes);
+app.use('/api/v2/auth', authRoutes);
+app.use('/api/v2/admin', adminRoutes);
+app.use('/api/v2/academic', academicRoutes);
+app.use('/api/v2/attendance', attendanceRoutes);
+app.use('/api/v2/leaves', leaveRoutes);
+app.use('/api/v2/health', healthRoutes);
 
+// Root
 app.get('/', (req, res) => {
-    res.send('Attendify API is running...');
+    res.send('Attendify API v2 is running...');
 });
 
 const PORT = process.env.PORT || 5000;
