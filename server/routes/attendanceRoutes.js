@@ -1,6 +1,6 @@
 
 import express from 'express';
-import { markAttendance, getAttendance } from '../controllers/attendanceController.js';
+import { markAttendance, getAttendance, getWeeklySummary } from '../controllers/attendanceController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(protect);
 
 router.post('/mark', markAttendance); // Teacher only
+router.get('/weekly-summary', getWeeklySummary); // Teacher only
 router.get('/course/:courseId', getAttendance); // Teacher (all), Student (own)
 
 export default router;

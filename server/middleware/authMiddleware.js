@@ -15,8 +15,22 @@ export const protect = async (req, res, next) => {
             // Verify token
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            // Get user from the token
-            req.user = await User.findById(decoded.id).select('-passwordHash');
+            // SPECIAL CHECK: Env-Only Admin
+            if (decoded.id === 'env-admin-id-001') {
+                req.user = {
+                    _id: 'env-admin-id-001',
+                    email: process.env.ADMIN_EMAIL,
+                    role: 'admin'
+                };
+            } else {
+                // Get user from the token (Database)
+                req.user = await User.findById(decoded.id).select('-passwordHash');
+            }
+
+            // Ensure user valid (if DB lookup returned null)
+            if (!req.user) {
+                 return res.status(401).json({ message: 'Not authorized, user not found' });
+            }
 
             next();
         } catch (error) {

@@ -7,6 +7,16 @@ const leaveRequestSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    course: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course',
+        required: true
+    },
+    semester: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Semester',
+        required: true
+    },
     startDate: {
         type: Date,
         required: true

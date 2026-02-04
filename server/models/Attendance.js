@@ -1,10 +1,19 @@
-
 import mongoose from 'mongoose';
 
 const attendanceSchema = new mongoose.Schema({
+    student: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     course: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',
+        required: true
+    },
+    semester: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Semester',
         required: true
     },
     date: {
@@ -12,34 +21,22 @@ const attendanceSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
-    // Tracking attendance for the whole class for this specific session
-    records: [{
-        student: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            required: true
-        },
-        status: {
-            type: String,
-            enum: ['Present', 'Absent', 'Late', 'Excused'],
-            default: 'Present'
-        },
-        remarks: {
-            type: String,
-            trim: true
-        }
-    }],
-    recordedBy: { // Teacher who marked it
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+    status: {
+        type: String,
+        enum: ['Present', 'Absent', 'Leave'],
+        default: 'Present',
+        required: true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    markedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
+}, {
+    timestamps: true
 });
 
-// Ensure only one attendance record per course per day? 
-// Might depend on if multiple sessions exist. For now, leave flexible.
+// Prevent duplicate attendance for the same student in the same course on the same date
+attendanceSchema.index({ student: 1, course: 1, date: 1 }, { unique: true });
 
 export default mongoose.model('Attendance', attendanceSchema);

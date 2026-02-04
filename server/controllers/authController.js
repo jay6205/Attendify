@@ -61,7 +61,23 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
-    // Check for user email
+    // 1. Check for Env-based Admin
+    if (process.env.ADMIN_EMAIL && email === process.env.ADMIN_EMAIL) {
+        // Safe compare implementation
+        const isValid = await bcrypt.compare(password, await bcrypt.hash(process.env.ADMIN_PASSWORD, 10));
+        
+        if (isValid) {
+            return res.json({
+                _id: 'env-admin-id-001',
+                email: process.env.ADMIN_EMAIL,
+                role: 'admin',
+                token: generateToken('env-admin-id-001'),
+            });
+        }
+        return res.status(400).json({ message: 'Invalid admin credentials' });
+    }
+
+    // 2. Check for Database User
     const user = await User.findOne({ email });
 
     // ... existing loginUser code ...
@@ -69,6 +85,7 @@ export const loginUser = async (req, res) => {
         res.json({
             _id: user.id,
             email: user.email,
+            role: user.role, // Ensure role is sent (helps frontend)
             token: generateToken(user._id),
         });
     } else {
