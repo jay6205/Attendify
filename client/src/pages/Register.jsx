@@ -4,6 +4,7 @@ import AuthContext from '../context/AuthContext';
 import { UserPlus } from 'lucide-react';
 
 const Register = () => {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -14,17 +15,20 @@ const Register = () => {
         e.preventDefault();
         setError('');
         try {
-            await register(email, password);
+            await register(name, email, password);
             navigate('/');
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
         }
     };
+    
+    // ... (rest of return)
 
     return (
         <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
             <div className="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 w-full max-w-md backdrop-blur-md shadow-xl">
-                <div className="text-center mb-8">
+                 {/* ... header ... */}
+                 <div className="text-center mb-8">
                     <img 
                         src="/Gemini_Generated_Image_71kxcc71kxcc71kx.png" 
                         alt="Attendify Logo" 
@@ -43,6 +47,17 @@ const Register = () => {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">Full Name</label>
+                        <input 
+                            type="text" 
+                            required
+                            className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors"
+                            placeholder="John Doe"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                    </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
                         <input 

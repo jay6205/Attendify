@@ -36,8 +36,8 @@ export const AuthProvider = ({ children }) => {
         return res.data;
     };
 
-    const register = async (email, password) => {
-        const res = await api.post('/auth/register', { email, password });
+    const register = async (name, email, password) => {
+        const res = await api.post('/auth/register', { name, email, password });
         localStorage.setItem('token', res.data.token);
         setToken(res.data.token);
         setUser(res.data);
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
     };
 
-    const logout = async () => {
+    const logout = async (shouldRedirect = true) => {
         try {
             await api.post('/auth/logout');
         } catch (error) {
@@ -58,7 +58,9 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem('token');
             setToken(null);
             setUser(null);
-            window.location.href = '/';
+            if (shouldRedirect) {
+                window.location.href = '/';
+            }
         }
     };
 

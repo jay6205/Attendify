@@ -166,16 +166,20 @@ export const enrollStudent = async (req, res) => {
             return res.status(403).json({ message: 'Access denied: Admins only' });
         }
 
-        const { studentId, courseId } = req.body;
+        const { studentEmail, courseId } = req.body;
 
-        if (!studentId || !courseId) {
-            return res.status(400).json({ message: 'Student ID and Course ID are required' });
+        if (!studentEmail || !courseId) {
+            return res.status(400).json({ message: 'Student Email and Course ID are required' });
         }
 
-        const student = await User.findById(studentId);
-        if (!student || student.role !== 'student') {
-            return res.status(400).json({ message: 'Invalid student ID' });
+        // Changed from ID lookup to Email lookup for better UX
+        const student = await User.findOne({ email: studentEmail.toLowerCase().trim(), role: 'student' });
+        
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found with this email' });
         }
+
+        const studentId = student._id;
 
         const course = await Course.findById(courseId);
         if (!course) {
@@ -190,7 +194,25 @@ export const enrollStudent = async (req, res) => {
         course.students.push(studentId);
         await course.save();
 
-        res.json({ message: 'Student enrolled successfully', courseId: course._id });
+        res.json({ message: `Student '${student.name}' enrolled successfully`, courseId: course._id });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Get all Teachers
+// @route   GET /api/v2/admin/teachers
+// @access  Private/Admin
+export const getTeachers = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied: Admins only' });
+        }
+
+        const teachers = await User.find({ role: 'teacher' }).select('-passwordHash');
+        res.json(teachers);
 
     } catch (error) {
         console.error(error);

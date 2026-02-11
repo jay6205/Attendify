@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { LayoutDashboard, Calendar, PieChart, Settings, LogOut, Bot } from 'lucide-react';
+import { LayoutDashboard, Calendar, PieChart, Settings, LogOut, Bot, BookOpen, CheckSquare, FileText, BarChart } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
@@ -19,9 +19,32 @@ const SidebarItem = ({ icon: Icon, label, path, active }) => (
 
 const Sidebar = () => {
     const location = useLocation();
-    const { logout } = useContext(AuthContext);
+    const { logout, user } = useContext(AuthContext);
 
     const isActive = (path) => location.pathname === path;
+    const role = user?.role || 'student';
+
+    const menuItems = {
+        student: [
+            { icon: LayoutDashboard, label: "Dashboard", path: "/student" },
+            { icon: FileText, label: "My Leaves", path: "/student/leaves" },
+            { icon: Bot, label: "AI Advisor", path: "/ai-advisor" },
+            { icon: Settings, label: "Settings", path: "/settings" }
+        ],
+        teacher: [
+            { icon: LayoutDashboard, label: "Dashboard", path: "/teacher" },
+            { icon: BookOpen, label: "Courses", path: "/teacher/courses" },
+            { icon: CheckSquare, label: "Attendance", path: "/teacher/attendance" },
+            { icon: FileText, label: "Leaves", path: "/teacher/leaves" },
+            { icon: BarChart, label: "Summary", path: "/teacher/summary" }
+        ],
+        admin: [
+            { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
+            { icon: Settings, label: "System", path: "/admin/system" }
+        ]
+    };
+
+    const currentMenu = menuItems[role] || menuItems.student;
 
     return (
         <div className="w-16 md:w-64 h-screen bg-slate-900 border-r border-slate-800 p-4 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300">
@@ -37,12 +60,15 @@ const Sidebar = () => {
             </div>
 
             <nav className="flex-1 space-y-2">
-                <SidebarItem icon={LayoutDashboard} label="Dashboard" path="/" active={isActive('/')} />
-
-                <SidebarItem icon={Calendar} label="Timetable" path="/timetable" active={isActive('/timetable')} />
-                <SidebarItem icon={PieChart} label="Analytics" path="/analytics" active={isActive('/analytics')} />
-                <SidebarItem icon={Bot} label="AI Advisor" path="/ai-advisor" active={isActive('/ai-advisor')} />
-                <SidebarItem icon={Settings} label="Settings" path="/settings" active={isActive('/settings')} />
+                {currentMenu.map((item) => (
+                    <SidebarItem 
+                        key={item.path} 
+                        icon={item.icon} 
+                        label={item.label} 
+                        path={item.path} 
+                        active={isActive(item.path)} 
+                    />
+                ))}
             </nav>
 
             <div className="pt-6 border-t border-slate-800">

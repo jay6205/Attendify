@@ -1,28 +1,24 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import MainLayout from './layouts/MainLayout';
-import Dashboard from './pages/Dashboard';
+import StudentDashboard from './pages/StudentDashboard';
+import TeacherDashboard from './pages/TeacherDashboard';
+import TeacherCourses from './pages/TeacherCourses';
+import TeacherAttendance from './pages/TeacherAttendance';
+import TeacherLeaves from './pages/TeacherLeaves';
+import TeacherSummary from './pages/TeacherSummary';
+import AdminDashboard from './pages/AdminDashboard';
+import StudentLeaves from './pages/StudentLeaves';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AuthSuccess from './pages/AuthSuccess';
 
+// Future Pages
 import AIAdvisor from './pages/AIAdvisor';
-
-import Analytics from './pages/Analytics';
-
-import Timetable from './pages/Timetable';
 import Settings from './pages/Settings';
-
-// Placeholder components
-const Placeholder = ({ title }) => (
-  <div className="p-8 text-center text-slate-500">
-    <h2 className="text-2xl font-bold mb-2">{title}</h2>
-    <p>Coming Soon</p>
-  </div>
-);
 
 function App() {
   return (
@@ -30,25 +26,72 @@ function App() {
       <Router>
         <Routes>
           {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
+          <Route path="/login/student" element={<Login expectedRole="student" portalName="Student Portal" />} />
+          <Route path="/login/teacher" element={<Login expectedRole="teacher" portalName="Faculty Portal" />} />
+          <Route path="/login/admin" element={<Login expectedRole="admin" portalName="Admin Portal" />} />
+          
+          <Route path="/login" element={<Navigate to="/login/student" replace />} />
           <Route path="/register" element={<Register />} />
           <Route path="/auth/success" element={<AuthSuccess />} />
 
-          {/* Protected Routes */}
-          <Route element={<ProtectedRoute />}>
-             <Route path="/" element={
+          {/* Root Redirect Logic */}
+          <Route path="/" element={<Navigate to="/student" replace />} /> {/* Default to student or login */}
+
+          {/* Student Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+             <Route path="/student" element={
                  <MainLayout>
-                    <Dashboard />
+                    <StudentDashboard />
                  </MainLayout>
              } />
-             
-             {/* Future Routes */}
-
-             <Route path="/timetable" element={<MainLayout><Timetable /></MainLayout>} />
-             <Route path="/analytics" element={<MainLayout><Analytics /></MainLayout>} />
+             {/* Shared Student Pages */}
              <Route path="/ai-advisor" element={<MainLayout><AIAdvisor /></MainLayout>} />
              <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
+             <Route path="/student/leaves" element={<MainLayout><StudentLeaves /></MainLayout>} />
           </Route>
+
+          {/* Teacher Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['teacher']} />}>
+            <Route path="/teacher" element={
+                <MainLayout>
+                    <TeacherDashboard />
+                </MainLayout>
+            } />
+            <Route path="/teacher/courses" element={
+                <MainLayout>
+                    <TeacherCourses />
+                </MainLayout>
+            } />
+            <Route path="/teacher/attendance" element={
+                <MainLayout>
+                    <TeacherAttendance />
+                </MainLayout>
+            } />
+            <Route path="/teacher/leaves" element={
+                <MainLayout>
+                    <TeacherLeaves />
+                </MainLayout>
+            } />
+            <Route path="/teacher/summary" element={
+                <MainLayout>
+                    <TeacherSummary />
+                </MainLayout>
+            } />
+          </Route>
+
+          {/* Admin Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+            <Route path="/admin" element={
+                <MainLayout>
+                    <AdminDashboard />
+                </MainLayout>
+            } />
+          </Route>
+          
+          {/* Unauthorized / 404 */}
+          <Route path="/unauthorized" element={<div className="text-white p-10">Unauthorized Access</div>} />
+          <Route path="*" element={<Navigate to="/login/student" />} />
+
         </Routes>
       </Router>
     </AuthProvider>

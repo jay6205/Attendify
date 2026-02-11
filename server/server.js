@@ -32,16 +32,20 @@ import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import academicRoutes from './routes/academicRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
+import aiAttendanceRoutes from './routes/aiAttendanceRoutes.js';
 import leaveRoutes from './routes/leaveRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
 
 // Mount routers
 app.use('/api/v2/auth', authRoutes);
 app.use('/api/v2/admin', adminRoutes);
 app.use('/api/v2/academic', academicRoutes);
 app.use('/api/v2/attendance', attendanceRoutes);
+app.use('/api/v2/attendance/ai', aiAttendanceRoutes); // New AI Attendance Route
 app.use('/api/v2/leaves', leaveRoutes);
 app.use('/api/v2/health', healthRoutes);
+app.use('/api/v2/ai', aiRoutes);
 
 // Root
 app.get('/', (req, res) => {
