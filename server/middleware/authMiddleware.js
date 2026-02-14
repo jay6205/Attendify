@@ -15,12 +15,12 @@ export const protect = async (req, res, next) => {
             // Verify token
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            // SPECIAL CHECK: Env-Only Admin
-            if (decoded.id === 'env-admin-id-001') {
+            // SPECIAL CHECK: Env-Only Super Admin
+            if (decoded.role === 'super_admin' || decoded.id === 'env-super-admin-id-001') {
                 req.user = {
-                    _id: 'env-admin-id-001',
-                    email: process.env.ADMIN_EMAIL,
-                    role: 'admin'
+                    _id: 'env-super-admin-id-001',
+                    email: process.env.SUPER_ADMIN_EMAIL || process.env.ADMIN_EMAIL,
+                    role: 'super_admin'
                 };
             } else {
                 // Get user from the token (Database)

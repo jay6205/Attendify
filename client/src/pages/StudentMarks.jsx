@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, BookOpen, Calendar, Award } from 'lucide-react';
+import { BarChart, BookOpen, Calendar, Award, TrendingUp, ArrowUp, ArrowDown, Trophy } from 'lucide-react';
 import api from '../api/axios';
 import PageTransition from '../components/PageTransition';
+import { Link } from 'react-router-dom';
+import { getPerformanceBadge } from '../utils/percentile.util';
 
 const StudentMarks = () => {
     const [marksData, setMarksData] = useState([]);
@@ -53,30 +55,73 @@ const StudentMarks = () => {
                                 <div className="divide-y divide-slate-700/50">
                                     {courseData.assessments.map((assessment, i) => {
                                         const percentage = Math.round((assessment.obtained / assessment.max) * 100);
-                                        const isPass = percentage >= 40; // Example threshold
+                                        const isPass = percentage >= 40;
+                                        const badge = assessment.percentile != null ? getPerformanceBadge(assessment.percentile) : null;
 
                                         return (
-                                            <div key={i} className="p-5 flex items-center justify-between hover:bg-slate-800/30 transition-colors">
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <span className="font-medium text-slate-200">{assessment.title}</span>
-                                                        <span className="text-xs px-2 py-0.5 rounded bg-slate-700 text-slate-400 capitalize">
-                                                            {assessment.type}
-                                                        </span>
+                                            <div key={i} className="p-5 hover:bg-slate-800/30 transition-colors">
+                                                {/* Top Row: Title + Score */}
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div>
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <span className="font-medium text-slate-200">{assessment.title}</span>
+                                                            <span className="text-xs px-2 py-0.5 rounded bg-slate-700 text-slate-400 capitalize">
+                                                                {assessment.type}
+                                                            </span>
+                                                            {badge && (
+                                                                <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${badge.bg} ${badge.color}`}>
+                                                                    {badge.label}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                                                            <Calendar size={12} />
+                                                            <span>{new Date(assessment.date).toLocaleDateString()}</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-xs text-slate-500">
-                                                        <Calendar size={12} />
-                                                        <span>{new Date(assessment.date).toLocaleDateString()}</span>
+                                                    <div className="text-right">
+                                                        <div className="text-lg font-bold text-slate-100">
+                                                            {assessment.obtained} <span className="text-sm text-slate-500 font-normal">/ {assessment.max}</span>
+                                                        </div>
+                                                        <div className={`text-xs font-medium ${isPass ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                                            {percentage}%
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <div className="text-lg font-bold text-slate-100">
-                                                        {assessment.obtained} <span className="text-sm text-slate-500 font-normal">/ {assessment.max}</span>
+
+                                                {/* Stats Row */}
+                                                {assessment.totalStudents > 0 && (
+                                                    <div className="flex flex-wrap gap-3 text-xs">
+                                                        <div className="flex items-center gap-1.5 bg-slate-900/50 px-2.5 py-1.5 rounded-lg">
+                                                            <span className="text-slate-500">Avg</span>
+                                                            <span className="text-indigo-400 font-semibold">{assessment.classAverageMarks}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5 bg-slate-900/50 px-2.5 py-1.5 rounded-lg">
+                                                            <ArrowUp size={12} className="text-emerald-400" />
+                                                            <span className="text-slate-500">High</span>
+                                                            <span className="text-emerald-400 font-semibold">{assessment.classHighest}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5 bg-slate-900/50 px-2.5 py-1.5 rounded-lg">
+                                                            <ArrowDown size={12} className="text-rose-400" />
+                                                            <span className="text-slate-500">Low</span>
+                                                            <span className="text-rose-400 font-semibold">{assessment.classLowest}</span>
+                                                        </div>
+                                                        {assessment.percentile != null && (
+                                                            <div className="flex items-center gap-1.5 bg-slate-900/50 px-2.5 py-1.5 rounded-lg">
+                                                                <TrendingUp size={12} className="text-purple-400" />
+                                                                <span className="text-slate-500">Percentile</span>
+                                                                <span className="text-purple-400 font-semibold">{assessment.percentile}%</span>
+                                                            </div>
+                                                        )}
+                                                        <Link
+                                                            to={`/student/leaderboard/${assessment._id}`}
+                                                            className="flex items-center gap-1.5 bg-yellow-500/10 px-2.5 py-1.5 rounded-lg text-yellow-400 hover:bg-yellow-500/20 transition-colors border border-yellow-500/20"
+                                                        >
+                                                            <Trophy size={12} />
+                                                            <span className="font-medium">Leaderboard</span>
+                                                        </Link>
                                                     </div>
-                                                    <div className={`text-xs font-medium ${isPass ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                                        {percentage}%
-                                                    </div>
-                                                </div>
+                                                )}
                                             </div>
                                         );
                                     })}
@@ -91,3 +136,4 @@ const StudentMarks = () => {
 };
 
 export default StudentMarks;
+

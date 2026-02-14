@@ -24,14 +24,18 @@ const Login = ({ expectedRole = 'student', portalName = 'Student Portal' }) => {
             const data = await login(email, password);
 
             // ROLE GUARD: Check if user belongs to this portal
-            if (data.role !== expectedRole) {
+            // Exception: Super Admin can login via Admin portal
+            const isSuperAdminOnAdminPortal = expectedRole === 'admin' && data.role === 'super_admin';
+            
+            if (data.role !== expectedRole && !isSuperAdminOnAdminPortal) {
                 await logout(false); // Logout without redirecting
                 setError('Invalid email or password');
                 return;
             }
 
             // Redirect based on role
-            if (data.role === 'admin') navigate('/admin');
+            if (data.role === 'super_admin') navigate('/super-admin');
+            else if (data.role === 'admin') navigate('/admin');
             else if (data.role === 'teacher') navigate('/teacher');
             else navigate('/student');
         } catch (err) {

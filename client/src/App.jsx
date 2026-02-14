@@ -22,6 +22,12 @@ import MarksAnalyticsPage from './pages/MarksAnalyticsPage';
 import StudentMarks from './pages/StudentMarks';
 import MyPerformancePage from './pages/MyPerformancePage';
 import StudentPerformancePage from './pages/StudentPerformancePage';
+import SuperAdminDashboard from './pages/superAdmin/SuperAdminDashboard';
+import AdminManagementPage from './pages/superAdmin/AdminManagementPage';
+import OrganizationManagementPage from './pages/superAdmin/OrganizationManagementPage';
+import UsageDashboard from './pages/superAdmin/UsageDashboard';
+import StudentLeaderboardPage from './pages/student/AssessmentLeaderboardPage';
+import TeacherLeaderboardPage from './pages/teacher/AssessmentLeaderboardPage';
 
 // Future Pages
 import AIAdvisor from './pages/AIAdvisor';
@@ -57,6 +63,7 @@ function App() {
             <Route path="/ai-advisor" element={<MainLayout><AIAdvisor /></MainLayout>} />
             <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
             <Route path="/student/leaves" element={<MainLayout><StudentLeaves /></MainLayout>} />
+            <Route path="/student/leaderboard/:assessmentId" element={<MainLayout><StudentLeaderboardPage /></MainLayout>} />
           </Route>
 
           {/* Teacher Routes */}
@@ -111,6 +118,7 @@ function App() {
                     <StudentPerformancePage />
                 </MainLayout>
             } />
+            <Route path="/teacher/leaderboard/:assessmentId" element={<MainLayout><TeacherLeaderboardPage /></MainLayout>} />
           </Route>
 
           {/* Admin Routes */}
@@ -118,6 +126,35 @@ function App() {
             <Route path="/admin" element={
               <MainLayout>
                 <AdminDashboard />
+              </MainLayout>
+            } />
+             <Route path="/admin/system" element={
+              <MainLayout>
+                <Settings />
+              </MainLayout>
+            } />
+          </Route>
+
+          {/* Super Admin Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['super_admin']} />}>
+            <Route path="/super-admin" element={
+              <MainLayout>
+                <SuperAdminDashboard />
+              </MainLayout>
+            } />
+            <Route path="/super-admin/organizations" element={
+              <MainLayout>
+                <OrganizationManagementPage />
+              </MainLayout>
+            } />
+            <Route path="/super-admin/usage" element={
+              <MainLayout>
+                <UsageDashboard />
+              </MainLayout>
+            } />
+            <Route path="/super-admin/admins" element={
+              <MainLayout>
+                <AdminManagementPage />
               </MainLayout>
             } />
           </Route>

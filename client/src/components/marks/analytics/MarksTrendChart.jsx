@@ -16,17 +16,27 @@ const MarksTrendChart = ({ data, title, color = "#8884d8" }) => {
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
-            const dataPoint = payload[0].payload;
+            const d = payload[0].payload;
             return (
-                <div className="bg-slate-900 border border-slate-700 p-3 rounded-lg shadow-xl">
-                    <p className="font-bold text-slate-200 mb-1">{dataPoint.name}</p>
-                    <p className="text-xs text-slate-400 mb-2">{new Date(dataPoint.date).toLocaleDateString()}</p>
+                <div className="bg-slate-900 border border-slate-700 p-3 rounded-lg shadow-xl min-w-[160px]">
+                    <p className="font-bold text-slate-200 mb-1">{d.name}</p>
+                    <p className="text-xs text-slate-400 mb-2">{new Date(d.date).toLocaleDateString()}</p>
                     <p className="text-sm text-indigo-400 font-medium">
-                        Score: {dataPoint.obtained} / {dataPoint.max}
+                        Score: {d.obtained} / {d.max}
                     </p>
                     <p className="text-sm text-slate-300">
-                        Percentage: {dataPoint.percentage}%
+                        Percentage: {d.percentage}%
                     </p>
+                    {d.classAvg != null && (
+                        <p className="text-sm text-slate-400 mt-1">
+                            Class Avg: {d.classAvg} · High: {d.classHighest} · Low: {d.classLowest}
+                        </p>
+                    )}
+                    {d.percentile != null && (
+                        <p className="text-sm text-purple-400 font-medium mt-1">
+                            Percentile: {d.percentile}%
+                        </p>
+                    )}
                 </div>
             );
         }

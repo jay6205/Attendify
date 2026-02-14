@@ -27,7 +27,11 @@ const MyPerformancePage = () => {
                         date: a.date,
                         obtained: a.obtained,
                         max: a.max,
-                        percentage: Math.round((a.obtained / a.max) * 100)
+                        percentage: Math.round((a.obtained / a.max) * 100),
+                        percentile: a.percentile,
+                        classAvg: a.classAverageMarks,
+                        classHighest: a.classHighest,
+                        classLowest: a.classLowest
                     }));
 
                     // Comparison Data using Utility

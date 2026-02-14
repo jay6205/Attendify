@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const assessmentSchema = new mongoose.Schema({
+    organization: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization',
+        required: true
+    },
     course: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',

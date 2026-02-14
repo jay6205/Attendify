@@ -43,6 +43,18 @@ const userSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    organization: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization',
+        required: function() {
+            // Super admins technically don't belong to a single org, but everyone else DOES
+            return this.role !== 'super_admin';
+        }
     }
 });
 

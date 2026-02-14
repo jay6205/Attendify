@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { LayoutDashboard, Calendar, PieChart, Settings, LogOut, Bot, BookOpen, CheckSquare, FileText, BarChart, Award, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Calendar, PieChart, Settings, LogOut, Bot, BookOpen, CheckSquare, FileText, BarChart, BarChart2, Award, TrendingUp, Shield, Building2 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
@@ -46,6 +46,12 @@ const Sidebar = () => {
         admin: [
             { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
             { icon: Settings, label: "System", path: "/admin/system" }
+        ],
+        super_admin: [
+            { icon: LayoutDashboard, label: "Overview", path: "/super-admin" },
+            { icon: Building2, label: "Organizations", path: "/super-admin/organizations" },
+            { icon: Shield, label: "Admins", path: "/super-admin/admins" },
+            { icon: BarChart2, label: "Usage", path: "/super-admin/usage" }
         ]
     };
 

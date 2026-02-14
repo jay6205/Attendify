@@ -1,10 +1,10 @@
 import React from 'react';
 import Card from '../Card';
-import { Calendar, FileText, CheckCircle, ChevronRight } from 'lucide-react';
+import { Calendar, FileText, CheckCircle, ChevronRight, ArrowUp, ArrowDown, BarChart2, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const AssessmentCard = ({ assessment }) => {
-    const { _id, title, course, maxMarks, date, isPublished, submissionCount } = assessment;
+    const { _id, title, course, maxMarks, date, isPublished, submissionCount, avgMarks, highestMarks, lowestMarks } = assessment;
 
     const hasMarks = submissionCount > 0;
 
@@ -45,6 +45,27 @@ const AssessmentCard = ({ assessment }) => {
                         </div>
                     )}
                 </div>
+
+                {/* Stats Row */}
+                {hasMarks && avgMarks != null && (
+                    <div className="flex flex-wrap gap-2 mt-4 text-xs">
+                        <div className="flex items-center gap-1.5 bg-slate-900/50 px-2.5 py-1.5 rounded-lg">
+                            <BarChart2 size={12} className="text-indigo-400" />
+                            <span className="text-slate-500">Avg</span>
+                            <span className="text-indigo-400 font-semibold">{avgMarks}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-slate-900/50 px-2.5 py-1.5 rounded-lg">
+                            <ArrowUp size={12} className="text-emerald-400" />
+                            <span className="text-slate-500">High</span>
+                            <span className="text-emerald-400 font-semibold">{highestMarks}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-slate-900/50 px-2.5 py-1.5 rounded-lg">
+                            <ArrowDown size={12} className="text-rose-400" />
+                            <span className="text-slate-500">Low</span>
+                            <span className="text-rose-400 font-semibold">{lowestMarks}</span>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-800 flex gap-2">
@@ -65,13 +86,19 @@ const AssessmentCard = ({ assessment }) => {
                         'Enter Marks'
                     )}
                 </Link>
-                {/* Future: View Analytics */}
-                {/* <button className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
-                    <ChevronRight size={20} />
-                </button> */}
+                {hasMarks && (
+                    <Link
+                        to={`/teacher/leaderboard/${_id}`}
+                        className="p-2 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 rounded-lg transition-colors border border-yellow-500/20"
+                        title="View Leaderboard"
+                    >
+                        <Trophy size={18} />
+                    </Link>
+                )}
             </div>
         </Card>
     );
 };
 
 export default AssessmentCard;
+

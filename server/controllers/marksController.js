@@ -59,16 +59,36 @@ export const getTeacherAssessments = async (req, res) => {
             .populate('course', 'name code')
             .sort({ date: -1 });
 
-        // Get submission counts for each assessment
-        const assessmentsWithCounts = await Promise.all(assessments.map(async (assessment) => {
-            const submissionCount = await StudentMark.countDocuments({ assessment: assessment._id });
+        // Get stats for all assessments in one aggregation
+        const assessmentIds = assessments.map(a => a._id);
+        const stats = await StudentMark.aggregate([
+            { $match: { assessment: { $in: assessmentIds } } },
+            {
+                $group: {
+                    _id: "$assessment",
+                    count: { $sum: 1 },
+                    avg: { $avg: "$obtainedMarks" },
+                    highest: { $max: "$obtainedMarks" },
+                    lowest: { $min: "$obtainedMarks" }
+                }
+            }
+        ]);
+
+        const statsMap = {};
+        stats.forEach(s => { statsMap[s._id.toString()] = s; });
+
+        const assessmentsWithStats = assessments.map(assessment => {
+            const s = statsMap[assessment._id.toString()] || {};
             return {
                 ...assessment.toObject(),
-                submissionCount
+                submissionCount: s.count || 0,
+                avgMarks: s.avg != null ? parseFloat(s.avg.toFixed(1)) : null,
+                highestMarks: s.highest ?? null,
+                lowestMarks: s.lowest ?? null
             };
-        }));
+        });
 
-        res.json(assessmentsWithCounts);
+        res.json(assessmentsWithStats);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
@@ -200,7 +220,7 @@ export const getMyMarks = async (req, res) => {
             })
             .sort({ createdAt: -1 });
 
-        // 2. Get Class Averages for these assessments
+        // 2. Get Class Stats for these assessments (avg, highest, lowest, all scores)
         const assessmentIds = marks.map(m => m.assessment._id);
 
         const stats = await StudentMark.aggregate([
@@ -208,14 +228,18 @@ export const getMyMarks = async (req, res) => {
             {
                 $group: {
                     _id: "$assessment",
-                    avgMarks: { $avg: "$obtainedMarks" }
+                    avgMarks: { $avg: "$obtainedMarks" },
+                    highestMarks: { $max: "$obtainedMarks" },
+                    lowestMarks: { $min: "$obtainedMarks" },
+                    totalStudents: { $sum: 1 },
+                    allScores: { $push: "$obtainedMarks" }
                 }
             }
         ]);
 
         const statsMap = {};
         stats.forEach(s => {
-            statsMap[s._id.toString()] = s.avgMarks;
+            statsMap[s._id.toString()] = s;
         });
 
         // 3. Group by course
@@ -228,10 +252,17 @@ export const getMyMarks = async (req, res) => {
                 };
             }
 
-            const avg = statsMap[mark.assessment._id.toString()] || 0;
-            // Calculate avg percentage: (avgMarks / maxMarks) * 100
+            const stat = statsMap[mark.assessment._id.toString()] || {};
+            const avg = stat.avgMarks || 0;
             const max = mark.assessment.maxMarks;
             const avgPercentage = max > 0 ? ((avg / max) * 100).toFixed(1) : 0;
+
+            // Calculate percentile: (students scoring <= this student / total) * 100
+            const allScores = stat.allScores || [];
+            const totalStudents = stat.totalStudents || 1;
+            const studentScore = mark.obtainedMarks;
+            const studentsAtOrBelow = allScores.filter(s => s <= studentScore).length;
+            const percentile = parseFloat(((studentsAtOrBelow / totalStudents) * 100).toFixed(1));
 
             acc[courseCode].assessments.push({
                 _id: mark.assessment._id,
@@ -241,7 +272,11 @@ export const getMyMarks = async (req, res) => {
                 max: mark.assessment.maxMarks,
                 date: mark.assessment.date,
                 classAverageMarks: parseFloat(avg.toFixed(1)),
-                classAveragePercentage: parseFloat(avgPercentage)
+                classAveragePercentage: parseFloat(avgPercentage),
+                classHighest: stat.highestMarks || 0,
+                classLowest: stat.lowestMarks || 0,
+                totalStudents,
+                percentile
             });
             return acc;
         }, {});

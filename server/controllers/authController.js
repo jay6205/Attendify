@@ -11,8 +11,8 @@ const cookieOptions = {
 };
 
 // Generate JWT
-export const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
+export const generateToken = (id, role) => {
+    return jwt.sign({ id, role }, process.env.JWT_SECRET, {
         expiresIn: '30d',
     });
 };
@@ -51,7 +51,7 @@ export const registerUser = async (req, res) => {
                 _id: user.id,
                 email: user.email,
                 role: user.role, // Include role
-                token: generateToken(user._id),
+                token: generateToken(user._id, user.role),
             });
         } else {
             res.status(400).json({ message: 'Invalid user data' });
@@ -68,20 +68,23 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
-    // 1. Check for Env-based Admin
-    if (process.env.ADMIN_EMAIL && email === process.env.ADMIN_EMAIL) {
+    // 1. Check for Env-based Super Admin
+    const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
+    if (superAdminEmail && email === superAdminEmail) {
         // Safe compare implementation
-        const isValid = await bcrypt.compare(password, await bcrypt.hash(process.env.ADMIN_PASSWORD, 10));
+        const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;
+        const isValid = await bcrypt.compare(password, await bcrypt.hash(superAdminPassword, 10));
         
         if (isValid) {
             return res.json({
-                _id: 'env-admin-id-001',
-                email: process.env.ADMIN_EMAIL,
-                role: 'admin',
-                token: generateToken('env-admin-id-001'),
+                _id: 'env-super-admin-id-001',
+                email: superAdminEmail,
+                role: 'super_admin',
+                isSuperAdmin: true,
+                token: generateToken('env-super-admin-id-001', 'super_admin'),
             });
         }
-        return res.status(400).json({ message: 'Invalid admin credentials' });
+        return res.status(400).json({ message: 'Invalid super admin credentials' });
     }
 
     // 2. Check for Database User
@@ -89,11 +92,14 @@ export const loginUser = async (req, res) => {
 
     // ... existing loginUser code ...
     if (user && (await bcrypt.compare(password, user.passwordHash))) {
+        if (user.isActive === false) {
+             return res.status(403).json({ message: 'Account is disabled. Contact User.' });
+        }
         res.json({
             _id: user.id,
             email: user.email,
             role: user.role, // Ensure role is sent (helps frontend)
-            token: generateToken(user._id),
+            token: generateToken(user._id, user.role),
         });
     } else {
         res.status(400).json({ message: 'Invalid credentials' });
@@ -170,6 +176,6 @@ export const logoutUser = async (req, res) => {
 // @route   GET /api/v1/auth/google/callback
 // @access  Public
 export const googleAuthCallback = (req, res) => {
-    const token = generateToken(req.user._id);
+    const token = generateToken(req.user._id, req.user.role || 'student');
     res.redirect(`${process.env.CLIENT_URL}/auth/success?token=${token}`);
 };
