@@ -36,6 +36,7 @@ import aiAttendanceRoutes from './routes/aiAttendanceRoutes.js';
 import leaveRoutes from './routes/leaveRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import marksRoutes from './routes/marksRoutes.js';
 
 // Mount routers
 app.use('/api/v2/auth', authRoutes);
@@ -46,6 +47,8 @@ app.use('/api/v2/attendance/ai', aiAttendanceRoutes); // New AI Attendance Route
 app.use('/api/v2/leaves', leaveRoutes);
 app.use('/api/v2/health', healthRoutes);
 app.use('/api/v2/ai', aiRoutes);
+app.use('/api/v2/marks', marksRoutes);
+
 
 // Root
 app.get('/', (req, res) => {

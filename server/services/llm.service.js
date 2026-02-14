@@ -13,8 +13,8 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
  */
 export const generateLLMResponse = async (systemPrompt, userMessage) => {
     try {
-        // Use gemini-1.5-flash for speed and efficiency
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // Use gemini-2.5-flash for speed and efficiency
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         // Improve Prompt Structure for better instruction following
         const finalPrompt = `

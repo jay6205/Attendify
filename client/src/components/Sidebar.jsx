@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { LayoutDashboard, Calendar, PieChart, Settings, LogOut, Bot, BookOpen, CheckSquare, FileText, BarChart } from 'lucide-react';
+import { LayoutDashboard, Calendar, PieChart, Settings, LogOut, Bot, BookOpen, CheckSquare, FileText, BarChart, Award, TrendingUp } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
@@ -27,6 +27,8 @@ const Sidebar = () => {
     const menuItems = {
         student: [
             { icon: LayoutDashboard, label: "Dashboard", path: "/student" },
+            { icon: Award, label: "My Marks", path: "/student/marks" },
+            { icon: TrendingUp, label: "Performance", path: "/student/performance" },
             { icon: FileText, label: "My Leaves", path: "/student/leaves" },
             { icon: Bot, label: "AI Advisor", path: "/ai-advisor" },
             { icon: Settings, label: "Settings", path: "/settings" }
@@ -35,6 +37,9 @@ const Sidebar = () => {
             { icon: LayoutDashboard, label: "Dashboard", path: "/teacher" },
             { icon: BookOpen, label: "Courses", path: "/teacher/courses" },
             { icon: CheckSquare, label: "Attendance", path: "/teacher/attendance" },
+            { icon: Award, label: "Marks", path: "/teacher/marks" },
+            { icon: PieChart, label: "Analytics", path: "/teacher/marks/analytics" },
+            { icon: TrendingUp, label: "Student Trends", path: "/teacher/student-performance" },
             { icon: FileText, label: "Leaves", path: "/teacher/leaves" },
             { icon: BarChart, label: "Summary", path: "/teacher/summary" }
         ],
