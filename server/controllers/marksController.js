@@ -1,6 +1,7 @@
 import Assessment from '../models/Assessment.js';
 import StudentMark from '../models/StudentMark.js';
 import Course from '../models/Course.js';
+import { createBulkAlert } from '../services/alert.service.js';
 
 // @desc    Create a new assessment
 // @route   POST /api/v2/marks/assessment/create
@@ -157,6 +158,21 @@ export const enterMarks = async (req, res) => {
 
         if (bulkOps.length > 0) {
             await StudentMark.bulkWrite(bulkOps);
+
+            // ALERT TRIGGER: notify students that marks have been published
+            if (course.organization) {
+                const studentIds = marksData
+                    .filter(e => validStudentIds.has(e.studentId))
+                    .map(e => e.studentId);
+                createBulkAlert(
+                    studentIds,
+                    course.organization,
+                    'MARKS_PUBLISHED',
+                    `Marks published: ${assessment.title}`,
+                    `Marks for "${assessment.title}" in ${course.name} (${course.code}) have been published.`,
+                    { assessmentId: assessment._id, courseId: course._id, assessmentTitle: assessment.title }
+                );
+            }
         }
 
         res.json({
@@ -297,7 +313,20 @@ export const getMyMarks = async (req, res) => {
 // @access  Teacher, Admin
 export const getAssessmentsByCourse = async (req, res) => {
     try {
-        const assessments = await Assessment.find({ course: req.params.courseId })
+        const { courseId } = req.params;
+
+        // For teachers, verify they own the course
+        if (req.user.role === 'teacher') {
+            const course = await Course.findOne({
+                _id: courseId,
+                teacher: req.user._id
+            });
+            if (!course) {
+                return res.status(403).json({ message: 'Not authorized for this course' });
+            }
+        }
+
+        const assessments = await Assessment.find({ course: courseId })
             .populate('course', 'name code')
             .sort({ date: -1 });
         res.json(assessments);

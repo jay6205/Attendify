@@ -93,8 +93,7 @@ export const loginUser = async (req, res) => {
     // ... existing loginUser code ...
     if (user && (await bcrypt.compare(password, user.passwordHash))) {
         if (user.isActive === false) {
-             return res.status(403).json({ message: 'Account is disabled. Contact User.' });
-        }
+             return res.status(403).json({ message: 'Account is disabled. Contact support.' });        }
         const responseData = {
             _id: user.id,
             email: user.email,

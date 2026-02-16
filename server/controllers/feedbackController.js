@@ -8,6 +8,10 @@ import Course from '../models/Course.js';
 export const createFeedbackForm = async (req, res) => {
     try {
         const { courseId, assessmentId, type, questions } = req.body;
+        // Validate courseId
+        if (!courseId) {
+            return res.status(400).json({ message: 'courseId is required' });
+        }
 
         // Validate type
         if (!['POST_ASSESSMENT', 'END_COURSE'].includes(type)) {
@@ -17,6 +21,15 @@ export const createFeedbackForm = async (req, res) => {
         // POST_ASSESSMENT requires an assessmentId
         if (type === 'POST_ASSESSMENT' && !assessmentId) {
             return res.status(400).json({ message: 'assessmentId is required for POST_ASSESSMENT feedback' });
+        }
+        if (type === 'POST_ASSESSMENT') {
+            const assessment = await Assessment.findOne({
+                _id: assessmentId,
+                course: courseId
+            });
+            if (!assessment) {
+                return res.status(404).json({ message: 'Assessment not found or does not belong to this course' });
+            }
         }
 
         // Validate questions
@@ -127,6 +140,20 @@ export const submitFeedback = async (req, res) => {
         if (!answers || !Array.isArray(answers) || answers.length === 0) {
             return res.status(400).json({ message: 'Answers are required' });
         }
+        // Validate answers match form questions
+        for (const answer of answers) {
+            const questionIndex = answer.questionIndex;
+            if (questionIndex == null || questionIndex < 0 || questionIndex >= form.questions.length) {
+                return res.status(400).json({ message: `Invalid questionIndex: ${questionIndex}` });
+            }
+            const question = form.questions[questionIndex];
+            if (question.type === 'RATING') {
+                if (answer.ratingValue == null || answer.ratingValue < 1 || answer.ratingValue > question.scaleMax) {
+                    return res.status(400).json({ message: `Invalid rating for question ${questionIndex}` });
+                }
+            }
+        }
+
 
         // Verify student is enrolled in the course
         const course = await Course.findOne({
@@ -166,6 +193,21 @@ export const submitFeedback = async (req, res) => {
 export const getFeedbackSummary = async (req, res) => {
     try {
         const { courseId } = req.params;
+         // Verify teacher has access to this course (owns it or is admin)
+        const course = await Course.findOne({
+            _id: courseId,
+            organization: req.organizationId
+        });
+
+        if (!course) {
+            return res.status(404).json({ message: 'Course not found' });
+        }
+
+        const isAdmin = req.user.role === 'admin';
+        const isTeacher = course.teacher.toString() === req.user._id.toString();
+        if (!isAdmin && !isTeacher) {
+            return res.status(403).json({ message: 'Not authorized to view this course feedback' });
+        }
 
         // Find all forms for this course within the org
         const forms = await FeedbackForm.find({

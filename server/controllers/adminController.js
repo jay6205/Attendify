@@ -140,6 +140,9 @@ export const createCourse = async (req, res) => {
         if (!semester) {
             return res.status(400).json({ message: 'Invalid semester ID' });
         }
+        if (!req.user.organization) {
+            return res.status(400).json({ message: 'Admin organization not configured' });
+        }
 
         const course = await Course.create({
             name,

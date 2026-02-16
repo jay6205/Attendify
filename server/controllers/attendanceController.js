@@ -2,6 +2,7 @@ import Attendance from '../models/Attendance.js';
 import Course from '../models/Course.js';
 import Semester from '../models/Semester.js';
 import LeaveRequest from '../models/LeaveRequest.js';
+import { createAlert } from '../services/alert.service.js';
 
 // @desc    Mark attendance for a student (Teacher only)
 // @route   POST /api/v2/attendance/mark
@@ -79,6 +80,19 @@ export const markAttendance = async (req, res) => {
         );
 
         res.status(200).json(attendance);
+
+        // ALERT TRIGGER: notify student when marked absent (fire-and-forget)
+        if (status === 'Absent' && course.organization) {
+            const dateStr = attendanceDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            createAlert(
+                studentId,
+                course.organization,
+                'ABSENT',
+                `Absent in ${course.name}`,
+                `You were marked absent in ${course.name} (${course.code}) on ${dateStr}.`,
+                { courseId, courseName: course.name, date: attendanceDate }
+            );
+        }
 
     } catch (error) {
         console.error(error);

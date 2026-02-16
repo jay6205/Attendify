@@ -73,6 +73,7 @@ const CreateFeedbackForm = () => {
                 }
             } catch (err) {
                 console.error('Failed to fetch courses:', err);
+                setError('Failed to load courses. Please refresh the page.');
             } finally {
                 setCoursesLoading(false);
             }
@@ -90,6 +91,7 @@ const CreateFeedbackForm = () => {
                 setAssessments(res.data.map(a => ({ _id: a._id, title: a.title, courseId: a.course?._id })));
             } catch (err) {
                 console.error('Failed to fetch assessments:', err);
+                setError('Failed to load assessments. Please try again.');
             } finally {
                 setAssessmentsLoading(false);
             }

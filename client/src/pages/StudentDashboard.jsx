@@ -214,9 +214,9 @@ const StudentDashboard = () => {
                                 >
                                     {courses.map((course) => (
                                         <motion.div key={course._id} variants={item}>
+                                            {/* No update/delete handlers passed as students can't modify */}
                                             <CourseCard
                                                 {...course}
-                                            // No update/delete handlers passed as students can't modify
                                             />
                                         </motion.div>
                                     ))}

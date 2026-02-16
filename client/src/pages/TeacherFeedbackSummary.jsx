@@ -56,23 +56,34 @@ const TeacherFeedbackSummary = () => {
             return;
         }
 
+        const controller = new AbortController();
+
         const fetchSummary = async () => {
             setLoading(true);
             try {
-                const res = await api.get(`/feedback/summary/${selectedCourse}`);
-                setSummaryData(res.data);
+                const res = await api.get(`/feedback/summary/${selectedCourse}`, {
+                    signal: controller.signal
+                });
+                if (!controller.signal.aborted) {
+                    setSummaryData(res.data);
+                }
             } catch (err) {
+                if (controller.signal.aborted) return; // Ignore aborted requests
                 console.error('Failed to fetch feedback summary:', err);
                 setSummaryData(null);
             } finally {
-                setLoading(false);
+                if (!controller.signal.aborted) {
+                    setLoading(false);
+                }
             }
         };
         fetchSummary();
+
+        return () => controller.abort();
     }, [selectedCourse]);
 
     const renderRatingBar = (avg, max) => {
-        const pct = avg != null ? (avg / max) * 100 : 0;
+        const pct = avg != null && max > 0 ? (avg / max) * 100 : 0;
         return (
             <div className="flex items-center gap-3 w-full">
                 <div className="flex-1 h-3 bg-slate-700/50 rounded-full overflow-hidden">
@@ -159,11 +170,10 @@ const TeacherFeedbackSummary = () => {
                         <div className="p-6 border-b border-slate-700/30 flex items-center justify-between">
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full ${
-                                        summary.type === 'POST_ASSESSMENT'
-                                            ? 'bg-blue-500/15 text-blue-400 border border-blue-500/20'
-                                            : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
-                                    }`}>
+                                    <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full ${summary.type === 'POST_ASSESSMENT'
+                                        ? 'bg-blue-500/15 text-blue-400 border border-blue-500/20'
+                                        : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                                        }`}>
                                         {summary.type === 'POST_ASSESSMENT' ? 'Post Assessment' : 'End of Course'}
                                     </span>
                                     {summary.assessment && (

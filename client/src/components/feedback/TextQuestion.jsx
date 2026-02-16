@@ -3,10 +3,11 @@ import React from 'react';
 const TextQuestion = ({ question, index, value, onChange }) => {
     return (
         <div className="space-y-3">
-            <label className="block text-sm font-medium text-slate-200">
+            <label htmlFor={`text-question-${index}`} className="block text-sm font-medium text-slate-200">
                 {index + 1}. {question}
             </label>
             <textarea
+                id={`text-question-${index}`}
                 value={value || ''}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder="Share your thoughts... (optional)"

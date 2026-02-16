@@ -13,7 +13,9 @@ const RatingQuestion = ({ question, index, value, onChange, scaleMax = 5 }) => {
                         key={star}
                         type="button"
                         onClick={() => onChange(star)}
-                        className="transition-all duration-200 transform hover:scale-125 focus:outline-none"
+                        className="transition-all duration-200 transform hover:scale-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 rounded"
+                        aria-label={`Rate ${star} out of ${scaleMax}`}
+                        aria-pressed={star === value}
                     >
                         <Star
                             size={28}

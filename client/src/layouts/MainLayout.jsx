@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import Sidebar from '../components/Sidebar';
 import AuthContext from '../context/AuthContext';
 import ParentPhoneCaptureModal from '../components/auth/ParentPhoneCaptureModal';
+import AlertBell from '../components/alerts/AlertBell';
 
 const MainLayout = ({ children }) => {
   const { needsPhoneNumber, clearPhoneRequired } = useContext(AuthContext);
@@ -13,7 +14,11 @@ const MainLayout = ({ children }) => {
 
       {/* Main Content Area */}
       <div className="flex-1 ml-16 md:ml-64 transition-all duration-300">
-        <div className="p-8 max-w-7xl mx-auto">
+        {/* Top Bar with Alert Bell */}
+        <div className="flex items-center justify-end px-8 pt-4">
+          <AlertBell />
+        </div>
+        <div className="px-8 pb-8 max-w-7xl mx-auto">
           {children}
         </div>
       </div>

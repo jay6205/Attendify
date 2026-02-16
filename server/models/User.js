@@ -75,4 +75,12 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+// Keep phoneRequired in sync with role on every save
+userSchema.pre('save', function(next) {
+    if (this.isModified('role')) {
+        this.phoneRequired = (this.role === 'parent');
+    }
+    next();
+});
+
 export default mongoose.model('User', userSchema);

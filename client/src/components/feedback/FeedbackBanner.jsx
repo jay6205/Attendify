@@ -45,6 +45,14 @@ const FeedbackBanner = () => {
                         whileHover={{ scale: 1.01 }}
                         whileTap={{ scale: 0.99 }}
                         onClick={() => setSelectedForm(form)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelectedForm(form);
+                            }
+                        }}
+                        role="button"
+                        tabIndex={0}
                         className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30 rounded-xl p-4 cursor-pointer hover:border-indigo-400/50 transition-all group"
                     >
                         <div className="flex items-center justify-between">

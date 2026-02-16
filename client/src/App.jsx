@@ -34,6 +34,7 @@ import CreateFeedbackForm from './pages/CreateFeedbackForm';
 // Future Pages
 import AIAdvisor from './pages/AIAdvisor';
 import Settings from './pages/Settings';
+import AlertListPage from './components/alerts/AlertListPage';
 
 function App() {
   return (
@@ -67,6 +68,7 @@ function App() {
             <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
             <Route path="/student/leaves" element={<MainLayout><StudentLeaves /></MainLayout>} />
             <Route path="/student/leaderboard/:assessmentId" element={<MainLayout><StudentLeaderboardPage /></MainLayout>} />
+            <Route path="/alerts" element={<MainLayout><AlertListPage /></MainLayout>} />
           </Route>
 
           {/* Teacher Routes */}
@@ -132,6 +134,7 @@ function App() {
                 <CreateFeedbackForm />
               </MainLayout>
             } />
+            <Route path="/alerts" element={<MainLayout><AlertListPage /></MainLayout>} />
           </Route>
 
           {/* Admin Routes */}

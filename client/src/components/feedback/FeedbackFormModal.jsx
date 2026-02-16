@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, CheckCircle, Loader2 } from 'lucide-react';
 import RatingQuestion from './RatingQuestion';
@@ -16,6 +16,16 @@ const FeedbackFormModal = ({ form, onClose, onSubmitted }) => {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState('');
+    const submitTimeoutRef = useRef(null);
+
+    // Cleanup timeout on unmount to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            if (submitTimeoutRef.current) {
+                clearTimeout(submitTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const handleAnswerChange = (index, value) => {
         setAnswers(prev =>
@@ -51,7 +61,8 @@ const FeedbackFormModal = ({ form, onClose, onSubmitted }) => {
                 answers
             });
             setSubmitted(true);
-            setTimeout(() => {
+            if (submitTimeoutRef.current) clearTimeout(submitTimeoutRef.current);
+            submitTimeoutRef.current = setTimeout(() => {
                 onSubmitted?.();
                 onClose();
             }, 1500);
@@ -83,6 +94,9 @@ const FeedbackFormModal = ({ form, onClose, onSubmitted }) => {
                     transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                     className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-2xl"
                     onClick={(e) => e.stopPropagation()}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="feedback-modal-title"
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
@@ -94,6 +108,7 @@ const FeedbackFormModal = ({ form, onClose, onSubmitted }) => {
                         </div>
                         <button
                             onClick={onClose}
+                            aria-label="Close feedback form"
                             className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors"
                         >
                             <X size={20} />
