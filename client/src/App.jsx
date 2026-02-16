@@ -28,6 +28,8 @@ import OrganizationManagementPage from './pages/superAdmin/OrganizationManagemen
 import UsageDashboard from './pages/superAdmin/UsageDashboard';
 import StudentLeaderboardPage from './pages/student/AssessmentLeaderboardPage';
 import TeacherLeaderboardPage from './pages/teacher/AssessmentLeaderboardPage';
+import TeacherFeedbackSummary from './pages/TeacherFeedbackSummary';
+import CreateFeedbackForm from './pages/CreateFeedbackForm';
 
 // Future Pages
 import AIAdvisor from './pages/AIAdvisor';
@@ -42,6 +44,7 @@ function App() {
           <Route path="/login/student" element={<Login expectedRole="student" portalName="Student Portal" />} />
           <Route path="/login/teacher" element={<Login expectedRole="teacher" portalName="Faculty Portal" />} />
           <Route path="/login/admin" element={<Login expectedRole="admin" portalName="Admin Portal" />} />
+          <Route path="/login/parent" element={<Login expectedRole="parent" portalName="Parent Portal" />} />
 
           <Route path="/login" element={<Navigate to="/login/student" replace />} />
           <Route path="/register" element={<Register />} />
@@ -51,7 +54,7 @@ function App() {
           <Route path="/" element={<Navigate to="/student" replace />} /> {/* Default to student or login */}
 
           {/* Student Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+          <Route element={<ProtectedRoute allowedRoles={['student', 'parent']} />}>
             <Route path="/student" element={
               <MainLayout>
                 <StudentDashboard />
@@ -114,11 +117,21 @@ function App() {
               </MainLayout>
             } />
             <Route path="/teacher/student-performance" element={
-                <MainLayout>
-                    <StudentPerformancePage />
-                </MainLayout>
+              <MainLayout>
+                <StudentPerformancePage />
+              </MainLayout>
             } />
             <Route path="/teacher/leaderboard/:assessmentId" element={<MainLayout><TeacherLeaderboardPage /></MainLayout>} />
+            <Route path="/teacher/feedback" element={
+              <MainLayout>
+                <TeacherFeedbackSummary />
+              </MainLayout>
+            } />
+            <Route path="/teacher/feedback/create" element={
+              <MainLayout>
+                <CreateFeedbackForm />
+              </MainLayout>
+            } />
           </Route>
 
           {/* Admin Routes */}
@@ -128,9 +141,19 @@ function App() {
                 <AdminDashboard />
               </MainLayout>
             } />
-             <Route path="/admin/system" element={
+            <Route path="/admin/system" element={
               <MainLayout>
                 <Settings />
+              </MainLayout>
+            } />
+            <Route path="/admin/feedback/create" element={
+              <MainLayout>
+                <CreateFeedbackForm />
+              </MainLayout>
+            } />
+            <Route path="/admin/feedback" element={
+              <MainLayout>
+                <TeacherFeedbackSummary />
               </MainLayout>
             } />
           </Route>

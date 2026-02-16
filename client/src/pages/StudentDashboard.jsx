@@ -6,6 +6,7 @@ import AuthContext from '../context/AuthContext';
 import PageTransition from '../components/PageTransition';
 import SkeletonCard from '../components/SkeletonCard';
 import StudentActiveSessionCard from '../components/StudentActiveSessionCard';
+import FeedbackBanner from '../components/feedback/FeedbackBanner';
 import { LayoutDashboard, BookOpen, AlertCircle } from 'lucide-react';
 
 // Stat Card Component
@@ -23,7 +24,7 @@ const StatCard = ({ label, value, subtext, icon, color }) => (
 );
 
 const StudentDashboard = () => {
-    const { user } = useContext(AuthContext);
+    const { user, loginAs } = useContext(AuthContext);
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -32,10 +33,10 @@ const StudentDashboard = () => {
             // 1. Fetch Enrolled Courses
             const coursesRes = await api.get('/academic/courses');
             let enrolledCourses = coursesRes.data;
-            
+
             // Client-side Filter (if backend sends all)
             if (user && enrolledCourses.length > 0) {
-                 enrolledCourses = enrolledCourses.filter(c => c.students.some(s => s._id === user._id || s === user._id));
+                enrolledCourses = enrolledCourses.filter(c => c.students.some(s => s._id === user._id || s === user._id));
             }
 
             // 2. Fetch Attendance for Each Course (Parallel Request)
@@ -43,7 +44,7 @@ const StudentDashboard = () => {
                 try {
                     const attRes = await api.get(`/attendance/course/${course._id}`);
                     const records = attRes.data || [];
-                    
+
                     // Logic: Count 'Present'
                     const attended = records.filter(r => r.status === 'Present').length;
                     // Logic: Total is Present + Absent. 'Leave' is officially "Exempted" or counted?
@@ -75,7 +76,7 @@ const StudentDashboard = () => {
     // Helper to calculate summary stats
     const calculateStats = () => {
         if (!courses.length) return { avg: 0, totalClasses: 0, bunkable: 0, critical: 0 };
-        
+
         let totalPct = 0;
         let totalClasses = 0;
         let bunkable = 0;
@@ -84,17 +85,17 @@ const StudentDashboard = () => {
 
         courses.forEach(sub => {
             if (sub.total === 0) return; // Skip empty courses from Avg calculation? Or count as 0?
-            
+
             countedCourses++;
             const pct = (sub.attended / sub.total) * 100;
             totalPct += pct;
             totalClasses += sub.total;
-            
+
             const target = user?.attendanceRequirement || 75;
             if (pct >= target) {
-                 const possibleTotal = sub.attended / (target / 100);
-                 const safe = Math.floor(possibleTotal - sub.total);
-                 if (safe > 0) bunkable += safe;
+                const possibleTotal = sub.attended / (target / 100);
+                const safe = Math.floor(possibleTotal - sub.total);
+                if (safe > 0) bunkable += safe;
             } else {
                 critical++;
             }
@@ -127,36 +128,39 @@ const StudentDashboard = () => {
                 {/* Header */}
                 <header className="flex justify-between items-end">
                     <div>
-                         <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-1">
-                            Hello, {user?.name || 'Student'}
+                        <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-1">
+                            Hello, {user?.name || (loginAs === 'parent' ? 'Parent' : 'Student')}
                         </h1>
-                         <p className="text-slate-400 flex items-center gap-2">
+                        <p className="text-slate-400 flex items-center gap-2">
                             <LayoutDashboard size={18} />
                             Track your academic progress
                         </p>
                     </div>
                     {courses.length > 0 && (
-                         <div className="text-right hidden md:block">
-                             <span className="text-slate-400 text-sm">Aggregate</span>
-                             <div className={`text-3xl font-bold ${stats.avg >= 75 ? "text-emerald-400" : "text-rose-400"}`}>
-                                 {stats.avg}%
-                             </div>
+                        <div className="text-right hidden md:block">
+                            <span className="text-slate-400 text-sm">Aggregate</span>
+                            <div className={`text-3xl font-bold ${stats.avg >= 75 ? "text-emerald-400" : "text-rose-400"}`}>
+                                {stats.avg}%
+                            </div>
                         </div>
                     )}
                 </header>
 
-                {/* AI Attendance Section */}
-                {courses.length > 0 && !loading && (
+                {/* AI Attendance Section — hidden for parents */}
+                {loginAs !== 'parent' && courses.length > 0 && !loading && (
                     <div className="mb-8">
                         {courses.map(course => (
-                            <StudentActiveSessionCard 
-                                key={course._id} 
-                                courseId={course._id} 
-                                courseName={course.name} 
+                            <StudentActiveSessionCard
+                                key={course._id}
+                                courseId={course._id}
+                                courseName={course.name}
                             />
                         ))}
                     </div>
                 )}
+
+                {/* Feedback Banner — hidden for parents */}
+                {loginAs !== 'parent' && !loading && <FeedbackBanner />}
 
                 {courses.length === 0 && !loading ? (
                     <div className="bg-slate-800/50 rounded-2xl p-12 text-center border border-slate-700 dashed-border">
@@ -168,26 +172,26 @@ const StudentDashboard = () => {
                     <>
                         {/* Stats Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <StatCard 
-                                label="Avg Attendance" 
-                                value={`${stats.avg}%`} 
+                            <StatCard
+                                label="Avg Attendance"
+                                value={`${stats.avg}%`}
                                 subtext={stats.avg >= 75 ? "Good" : "Attention"}
                                 color={stats.avg >= 75 ? "text-emerald-400 bg-emerald-400" : "text-rose-400 bg-rose-400"}
                             />
-                            <StatCard 
-                                label="Total Classes" 
-                                value={stats.totalClasses} 
+                            <StatCard
+                                label="Total Classes"
+                                value={stats.totalClasses}
                                 color="text-indigo-400"
                             />
-                            <StatCard 
-                                label="Safe Bunks" 
-                                value={stats.bunkable} 
+                            <StatCard
+                                label="Safe Bunks"
+                                value={stats.bunkable}
                                 icon="🏖️"
                                 color="text-emerald-400"
                             />
-                            <StatCard 
-                                label="Critical" 
-                                value={stats.critical} 
+                            <StatCard
+                                label="Critical"
+                                value={stats.critical}
                                 icon="⚠️"
                                 color="text-rose-400"
                             />
@@ -196,13 +200,13 @@ const StudentDashboard = () => {
                         {/* Courses Grid */}
                         <section>
                             <h2 className="text-xl font-bold text-slate-100 mb-6">My Courses</h2>
-                            
+
                             {loading ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                                     {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
                                 </div>
                             ) : (
-                                <motion.div 
+                                <motion.div
                                     variants={container}
                                     initial="hidden"
                                     animate="show"
@@ -210,9 +214,9 @@ const StudentDashboard = () => {
                                 >
                                     {courses.map((course) => (
                                         <motion.div key={course._id} variants={item}>
-                                            <CourseCard 
+                                            <CourseCard
                                                 {...course}
-                                                // No update/delete handlers passed as students can't modify
+                                            // No update/delete handlers passed as students can't modify
                                             />
                                         </motion.div>
                                     ))}

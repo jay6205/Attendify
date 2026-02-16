@@ -146,7 +146,8 @@ export const createCourse = async (req, res) => {
             code,
             semester: semesterId,
             teacher: teacherId,
-            credits: credits || 3
+            credits: credits || 3,
+            organization: req.user.organization
         });
 
         res.status(201).json(course);

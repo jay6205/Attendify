@@ -41,6 +41,8 @@ import superAdminRoutes from './routes/superAdminRoutes.js';
 import organizationRoutes from './routes/organizationRoutes.js';
 import superAdminMetricsRoutes from './routes/superAdminMetricsRoutes.js';
 import leaderboardRoutes from './routes/leaderboardRoutes.js';
+import feedbackRoutes from './routes/feedbackRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 // Mount routers
 app.use('/api/v2/auth', authRoutes);
@@ -56,6 +58,8 @@ app.use('/api/v2/health', healthRoutes);
 app.use('/api/v2/ai', aiRoutes);
 app.use('/api/v2/marks', marksRoutes);
 app.use('/api/v2/leaderboard', leaderboardRoutes);
+app.use('/api/v2/feedback', feedbackRoutes);
+app.use('/api/v2/users', userRoutes);
 
 
 // Root

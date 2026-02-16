@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'teacher', 'student'],
+        enum: ['admin', 'teacher', 'student', 'parent'],
         default: 'student', // Default to student if not specified, though usually should be explicit
         required: true
     },
@@ -40,6 +40,23 @@ const userSchema = new mongoose.Schema({
         batch: { type: String }, // e.g. "2023-2027"
         currentSemester: { type: Number },
     },
+    // --- Parent Phone Support ---
+    phoneNumber: {
+        type: String,
+        default: null
+    },
+    phoneVerified: {
+        type: Boolean,
+        default: false
+        // TODO: Future — OTP verification, WhatsApp opt-in, notification preferences
+    },
+    phoneRequired: {
+        type: Boolean,
+        default: function() {
+            return this.role === 'parent';
+        }
+    },
+    // --- End Parent Phone Support ---
     createdAt: {
         type: Date,
         default: Date.now

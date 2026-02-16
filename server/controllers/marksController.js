@@ -291,3 +291,18 @@ export const getMyMarks = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+// @desc    Get all assessments for a specific course
+// @route   GET /api/v2/marks/assessment/course/:courseId
+// @access  Teacher, Admin
+export const getAssessmentsByCourse = async (req, res) => {
+    try {
+        const assessments = await Assessment.find({ course: req.params.courseId })
+            .populate('course', 'name code')
+            .sort({ date: -1 });
+        res.json(assessments);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};

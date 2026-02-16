@@ -21,13 +21,17 @@ const Login = ({ expectedRole = 'student', portalName = 'Student Portal' }) => {
         e.preventDefault();
         setError('');
         try {
-            const data = await login(email, password);
+            const data = await login(email, password, expectedRole);
 
             // ROLE GUARD: Check if user belongs to this portal
             // Exception: Super Admin can login via Admin portal
+            // Exception: Parent ↔ Student portals are interchangeable (shared credentials)
             const isSuperAdminOnAdminPortal = expectedRole === 'admin' && data.role === 'super_admin';
-            
-            if (data.role !== expectedRole && !isSuperAdminOnAdminPortal) {
+            const isStudentParentCrossLogin =
+                (expectedRole === 'student' && data.role === 'parent') ||
+                (expectedRole === 'parent' && data.role === 'student');
+
+            if (data.role !== expectedRole && !isSuperAdminOnAdminPortal && !isStudentParentCrossLogin) {
                 await logout(false); // Logout without redirecting
                 setError('Invalid email or password');
                 return;
@@ -37,7 +41,7 @@ const Login = ({ expectedRole = 'student', portalName = 'Student Portal' }) => {
             if (data.role === 'super_admin') navigate('/super-admin');
             else if (data.role === 'admin') navigate('/admin');
             else if (data.role === 'teacher') navigate('/teacher');
-            else navigate('/student');
+            else navigate('/student'); // Both student and parent share student dashboard
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');
         }
@@ -46,6 +50,7 @@ const Login = ({ expectedRole = 'student', portalName = 'Student Portal' }) => {
     const getPortalColor = () => {
         if (expectedRole === 'admin') return 'from-rose-400 to-orange-400';
         if (expectedRole === 'teacher') return 'from-emerald-400 to-teal-400';
+        if (expectedRole === 'parent') return 'from-amber-400 to-yellow-400';
         return 'from-indigo-400 to-purple-400';
     };
 
@@ -107,7 +112,7 @@ const Login = ({ expectedRole = 'student', portalName = 'Student Portal' }) => {
                 {/* Portal Switcher */}
                 <div className="mt-6 pt-6 border-t border-slate-700/50 space-y-2">
                     <p className="text-xs text-center text-slate-500 mb-3">Not your portal?</p>
-                    <div className="flex justify-center gap-4 text-sm">
+                    <div className="flex justify-center gap-4 text-sm flex-wrap">
                         {expectedRole !== 'student' && (
                             <Link to="/login/student" className="text-indigo-400 hover:text-indigo-300">Student Login</Link>
                         )}
@@ -116,6 +121,9 @@ const Login = ({ expectedRole = 'student', portalName = 'Student Portal' }) => {
                         )}
                         {expectedRole !== 'admin' && (
                             <Link to="/login/admin" className="text-rose-400 hover:text-rose-300">Admin Login</Link>
+                        )}
+                        {expectedRole !== 'parent' && (
+                            <Link to="/login/parent" className="text-amber-400 hover:text-amber-300">Parent Login</Link>
                         )}
                     </div>
                 </div>

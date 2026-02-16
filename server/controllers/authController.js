@@ -95,12 +95,19 @@ export const loginUser = async (req, res) => {
         if (user.isActive === false) {
              return res.status(403).json({ message: 'Account is disabled. Contact User.' });
         }
-        res.json({
+        const responseData = {
             _id: user.id,
             email: user.email,
             role: user.role, // Ensure role is sent (helps frontend)
             token: generateToken(user._id, user.role),
-        });
+        };
+
+        // Parent phone capture: flag frontend to show phone modal
+        if (user.role === 'parent' && !user.phoneNumber) {
+            responseData.needsPhoneNumber = true;
+        }
+
+        res.json(responseData);
     } else {
         res.status(400).json({ message: 'Invalid credentials' });
     }

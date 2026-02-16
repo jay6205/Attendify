@@ -14,7 +14,11 @@ const CourseCard = ({ _id, name, code, attended, total, target = 75 }) => {
     let badgeColor = "";
     let message = "";
 
-    if (isSafe) {
+    if (total === 0) {
+        badgeText = "No Classes Yet";
+        badgeColor = "bg-slate-500/20 text-slate-400 border-slate-500/30";
+        message = "Waiting for lectures";
+    } else if (isSafe) {
         const possibleTotal = attended / (target / 100);
         const safeBunks = Math.floor(possibleTotal - total);
         if (safeBunks > 0) {
@@ -27,9 +31,6 @@ const CourseCard = ({ _id, name, code, attended, total, target = 75 }) => {
             message = "Maintain attendance";
         }
     } else {
-        const req = target / 100;
-        // Formula: (Attended + Need) / (Total + Need) = Target
-        // A + x = T*Target + x*Target -> x(1-Target) = T*Target - A
         const required = Math.ceil(((target / 100) * total - attended) / (1 - (target / 100)));
         badgeText = "Low Attendance";
         badgeColor = "bg-rose-500/20 text-rose-400 border-rose-500/30";
