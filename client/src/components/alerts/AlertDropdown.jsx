@@ -23,6 +23,15 @@ const timeAgo = (date) => {
 };
 
 const AlertDropdown = ({ alerts, loading, onMarkRead, onMarkAllRead, onClose, unreadCount }) => {
+    const safeAlerts = alerts || [];
+
+    const handleAlertKeyDown = (e, alert) => {
+        if ((e.key === 'Enter' || e.key === ' ') && !alert.isRead) {
+            e.preventDefault();
+            onMarkRead(alert._id);
+        }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -59,21 +68,24 @@ const AlertDropdown = ({ alerts, loading, onMarkRead, onMarkAllRead, onClose, un
                     <div className="flex items-center justify-center py-12">
                         <div className="w-5 h-5 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
                     </div>
-                ) : alerts.length === 0 ? (
+                ) : safeAlerts.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                         <BellOff size={32} className="text-slate-600 mb-3" />
                         <p className="text-sm text-slate-500">No notifications yet</p>
                         <p className="text-xs text-slate-600 mt-1">You're all caught up!</p>
                     </div>
                 ) : (
-                    alerts.map((alert) => {
+                    safeAlerts.map((alert) => {
                         const config = typeConfig[alert.type] || typeConfig.GENERAL;
                         const Icon = config.icon;
                         return (
                             <div
                                 key={alert._id}
+                                role="button"
+                                tabIndex={0}
                                 onClick={() => !alert.isRead && onMarkRead(alert._id)}
-                                className={`px-5 py-3.5 flex gap-3 cursor-pointer transition-colors hover:bg-slate-800/40 ${
+                                onKeyDown={(e) => handleAlertKeyDown(e, alert)}
+                                className={`px-5 py-3.5 flex gap-3 cursor-pointer transition-colors hover:bg-slate-800/40 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-inset ${
                                     !alert.isRead ? 'bg-slate-800/20' : ''
                                 }`}
                             >
@@ -107,7 +119,7 @@ const AlertDropdown = ({ alerts, loading, onMarkRead, onMarkAllRead, onClose, un
             </div>
 
             {/* Footer */}
-            {alerts.length > 0 && (
+            {safeAlerts.length > 0 && (
                 <div className="border-t border-slate-700/40 px-5 py-3">
                     <Link
                         to="/alerts"

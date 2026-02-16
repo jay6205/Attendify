@@ -74,7 +74,7 @@ export const loginUser = async (req, res) => {
         // Safe compare implementation
         const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;
         const isValid = await bcrypt.compare(password, await bcrypt.hash(superAdminPassword, 10));
-        
+
         if (isValid) {
             return res.json({
                 _id: 'env-super-admin-id-001',
@@ -93,7 +93,8 @@ export const loginUser = async (req, res) => {
     // ... existing loginUser code ...
     if (user && (await bcrypt.compare(password, user.passwordHash))) {
         if (user.isActive === false) {
-             return res.status(403).json({ message: 'Account is disabled. Contact support.' });        }
+            return res.status(403).json({ message: 'Account is disabled. Contact support.' });
+        }
         const responseData = {
             _id: user.id,
             email: user.email,

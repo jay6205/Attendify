@@ -1,6 +1,7 @@
 import FeedbackForm from '../models/FeedbackForm.js';
 import FeedbackResponse from '../models/FeedbackResponse.js';
 import Course from '../models/Course.js';
+import Assessment from '../models/Assessment.js';
 
 // @desc    Create a new feedback form
 // @route   POST /api/v2/feedback/create
@@ -193,7 +194,7 @@ export const submitFeedback = async (req, res) => {
 export const getFeedbackSummary = async (req, res) => {
     try {
         const { courseId } = req.params;
-         // Verify teacher has access to this course (owns it or is admin)
+        // Verify teacher has access to this course (owns it or is admin)
         const course = await Course.findOne({
             _id: courseId,
             organization: req.organizationId

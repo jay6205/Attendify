@@ -51,9 +51,6 @@ export const createAssessment = async (req, res) => {
 // @desc    Get all assessments by teacher
 // @route   GET /api/v2/marks/assessment/teacher/all
 // @access  Teacher
-// @desc    Get all assessments by teacher
-// @route   GET /api/v2/marks/assessment/teacher/all
-// @access  Teacher
 export const getTeacherAssessments = async (req, res) => {
     try {
         const assessments = await Assessment.find({ teacher: req.user._id })
@@ -120,6 +117,9 @@ export const enterMarks = async (req, res) => {
 
         // 2. Fetch Course to validate students
         const course = await Course.findById(assessment.course);
+        if (!course) {
+            return res.status(404).json({ message: 'Associated course not found' });
+        }
 
         const validStudentIds = new Set(course.students.map(id => id.toString()));
         const bulkOps = [];
@@ -171,7 +171,7 @@ export const enterMarks = async (req, res) => {
                     `Marks published: ${assessment.title}`,
                     `Marks for "${assessment.title}" in ${course.name} (${course.code}) have been published.`,
                     { assessmentId: assessment._id, courseId: course._id, assessmentTitle: assessment.title }
-                );
+                ).catch(err => console.error(`[AlertTrigger] Failed marks alert for assessment=${assessment._id} course=${course._id}:`, err.message));
             }
         }
 
@@ -315,7 +315,7 @@ export const getAssessmentsByCourse = async (req, res) => {
     try {
         const { courseId } = req.params;
 
-        // For teachers, verify they own the course
+        // Role-based authorization
         if (req.user.role === 'teacher') {
             const course = await Course.findOne({
                 _id: courseId,
@@ -324,6 +324,8 @@ export const getAssessmentsByCourse = async (req, res) => {
             if (!course) {
                 return res.status(403).json({ message: 'Not authorized for this course' });
             }
+        } else if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Not authorized for this course' });
         }
 
         const assessments = await Assessment.find({ course: courseId })

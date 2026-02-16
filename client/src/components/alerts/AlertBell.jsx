@@ -46,6 +46,10 @@ const AlertBell = () => {
     }, []);
 
     const handleMarkRead = async (alertId) => {
+        // Find the alert and only proceed if it was actually unread
+        const targetAlert = alerts.find(a => a._id === alertId);
+        if (!targetAlert || targetAlert.isRead) return;
+
         try {
             await api.put(`/alerts/${alertId}/read`, { portal });
             setAlerts(prev => prev.map(a => a._id === alertId ? { ...a, isRead: true } : a));
@@ -71,6 +75,7 @@ const AlertBell = () => {
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors"
                 aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+                aria-expanded={isOpen}
             >
                 <Bell size={20} />
                 {unreadCount > 0 && (

@@ -48,10 +48,14 @@ const AlertListPage = () => {
     }, [portal]);
 
     useEffect(() => {
+        setPage(1);
         fetchAlerts(1);
     }, [fetchAlerts]);
 
     const handleMarkRead = async (alertId) => {
+        const targetAlert = alerts.find(a => a._id === alertId);
+        if (!targetAlert || targetAlert.isRead) return;
+
         try {
             await api.put(`/alerts/${alertId}/read`, { portal });
             setAlerts(prev => prev.map(a => a._id === alertId ? { ...a, isRead: true } : a));
@@ -73,6 +77,13 @@ const AlertListPage = () => {
         const nextPage = page + 1;
         setPage(nextPage);
         fetchAlerts(nextPage);
+    };
+
+    const handleAlertKeyDown = (e, alert) => {
+        if ((e.key === 'Enter' || e.key === ' ') && !alert.isRead) {
+            e.preventDefault();
+            handleMarkRead(alert._id);
+        }
     };
 
     const filteredAlerts = alerts.filter(a => {
@@ -158,8 +169,11 @@ const AlertListPage = () => {
                                 <motion.div
                                     key={alert._id}
                                     variants={item}
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={() => !alert.isRead && handleMarkRead(alert._id)}
-                                    className={`flex items-start gap-4 p-4 rounded-xl border transition-colors cursor-pointer ${
+                                    onKeyDown={(e) => handleAlertKeyDown(e, alert)}
+                                    className={`flex items-start gap-4 p-4 rounded-xl border transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${
                                         !alert.isRead
                                             ? 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800/60'
                                             : 'bg-slate-800/20 border-slate-800/30 hover:bg-slate-800/30'

@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
     },
     passwordHash: {
         type: String,
-        required: function() { return !this.googleId; } // Required if not using Google Auth
+        required: function () { return !this.googleId; } // Required if not using Google Auth
     },
     googleId: {
         type: String,
@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
         // Teacher specific
         department: { type: String },
         qualification: { type: String },
-        
+
         // Student specific
         studentId: { type: String, unique: true, sparse: true, trim: true },
         batch: { type: String }, // e.g. "2023-2027"
@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema({
     },
     phoneRequired: {
         type: Boolean,
-        default: function() {
+        default: function () {
             return this.role === 'parent';
         }
     },
@@ -68,7 +68,7 @@ const userSchema = new mongoose.Schema({
     organization: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Organization',
-        required: function() {
+        required: function () {
             // Super admins technically don't belong to a single org, but everyone else DOES
             return this.role !== 'super_admin';
         }
@@ -76,11 +76,35 @@ const userSchema = new mongoose.Schema({
 });
 
 // Keep phoneRequired in sync with role on every save
-userSchema.pre('save', function(next) {
+userSchema.pre('save', function (next) {
     if (this.isModified('role')) {
         this.phoneRequired = (this.role === 'parent');
     }
     next();
 });
+
+// Keep phoneRequired in sync with role on atomic updates
+function syncPhoneRequiredOnUpdate() {
+    const update = this.getUpdate();
+    if (!update) return;
+
+    // Handle role in $set or top-level fields
+    const setRole = update.role || update.$set?.role;
+    if (setRole) {
+        const phoneRequired = (setRole === 'parent');
+        update.$set = update.$set || {};
+        update.$set.phoneRequired = phoneRequired;
+    }
+
+    // Handle role in $setOnInsert for upserts
+    const setOnInsertRole = update.$setOnInsert?.role;
+    if (setOnInsertRole) {
+        update.$setOnInsert.phoneRequired = (setOnInsertRole === 'parent');
+    }
+}
+
+userSchema.pre('findOneAndUpdate', syncPhoneRequiredOnUpdate);
+userSchema.pre('updateOne', syncPhoneRequiredOnUpdate);
+userSchema.pre('updateMany', syncPhoneRequiredOnUpdate);
 
 export default mongoose.model('User', userSchema);

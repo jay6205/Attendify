@@ -91,7 +91,7 @@ export const markAttendance = async (req, res) => {
                 `Absent in ${course.name}`,
                 `You were marked absent in ${course.name} (${course.code}) on ${dateStr}.`,
                 { courseId, courseName: course.name, date: attendanceDate }
-            );
+            ).catch(err => console.error(`[AlertTrigger] Failed absence alert for student=${studentId} course=${course.name} date=${dateStr}:`, err.message));
         }
 
     } catch (error) {

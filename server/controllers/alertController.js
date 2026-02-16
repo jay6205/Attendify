@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Alert from '../models/Alert.js';
 
 // @desc    Get alerts for the logged-in user (paginated)
@@ -5,8 +6,10 @@ import Alert from '../models/Alert.js';
 // @access  Private
 export const getMyAlerts = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 20;
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        let limit = parseInt(req.query.limit);
+        if (!limit || limit < 1 || isNaN(limit)) limit = 20;
+        limit = Math.min(limit, 100); // clamp to max 100
         const skip = (page - 1) * limit;
         const portal = req.query.portal || req.user.role; // fallback to role
 
@@ -50,13 +53,24 @@ export const getMyAlerts = async (req, res) => {
 // @desc    Mark a single alert as read for a specific portal
 // @route   PUT /api/v2/alerts/:alertId/read
 // @access  Private
+const VALID_PORTALS = ['student', 'parent'];
 export const markAlertRead = async (req, res) => {
     try {
+        const { alertId } = req.params;
+
+        // Validate ObjectId format
+        if (!mongoose.Types.ObjectId.isValid(alertId)) {
+            return res.status(400).json({ message: 'Invalid alertId' });
+        }
+
         const portal = req.body.portal || req.user.role;
+        if (!VALID_PORTALS.includes(portal)) {
+            return res.status(400).json({ message: 'Invalid portal value' });
+        }
 
         const alert = await Alert.findOneAndUpdate(
             {
-                _id: req.params.alertId,
+                _id: alertId,
                 user: req.user._id,
                 organization: req.organizationId
             },

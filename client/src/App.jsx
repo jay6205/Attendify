@@ -159,6 +159,7 @@ function App() {
                 <TeacherFeedbackSummary />
               </MainLayout>
             } />
+            <Route path="/alerts" element={<MainLayout><AlertListPage /></MainLayout>} />
           </Route>
 
           {/* Super Admin Routes */}
