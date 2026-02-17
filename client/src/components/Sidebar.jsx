@@ -49,7 +49,8 @@ const Sidebar = () => {
             { icon: FileText, label: "Leaves", path: "/teacher/leaves" },
             { icon: BarChart, label: "Summary", path: "/teacher/summary" },
             { icon: MessageSquare, label: "Feedback", path: "/teacher/feedback" },
-            { icon: MessageSquare, label: "Create Feedback", path: "/teacher/feedback/create" }
+            { icon: MessageSquare, label: "Create Feedback", path: "/teacher/feedback/create" },
+            { icon: Bot, label: "AI Advisor", path: "/ai-advisor" }
         ],
         admin: [
             { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
@@ -69,9 +70,13 @@ const Sidebar = () => {
     const effectiveRole = loginAs === 'parent' ? 'parent' : role;
     const currentMenu = menuItems[effectiveRole] || menuItems.student;
 
+
+
     return (
-        <div className="w-16 md:w-64 h-screen bg-slate-900 border-r border-slate-800 p-4 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300">
-            <div className="flex items-center space-x-3 mb-10 pl-2">
+
+        <div className="w-16 md:w-64 h-screen bg-slate-900 border-r border-slate-800 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300">
+            {/* Header - Fixed at Top */}
+            <div className="p-4 flex items-center space-x-3 pl-6 mb-2 flex-shrink-0">
                 <img
                     src="/Gemini_Generated_Image_71kxcc71kxcc71kx.png"
                     alt="Attendify Logo"
@@ -82,7 +87,8 @@ const Sidebar = () => {
                 </h1>
             </div>
 
-            <nav className="flex-1 space-y-2">
+            {/* Scrollable Navigation Area */}
+            <nav className="flex-1 overflow-y-auto px-4 space-y-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent pb-4">
                 {currentMenu.map((item) => (
                     <SidebarItem
                         key={item.path}
@@ -94,10 +100,11 @@ const Sidebar = () => {
                 ))}
             </nav>
 
-            <div className="pt-6 border-t border-slate-800">
+            {/* Logout - Fixed at Bottom */}
+            <div className="p-4 border-t border-slate-800 flex-shrink-0">
                 <button
                     onClick={logout}
-                    className="w-full flex items-center space-x-3 p-3 text-slate-400 hover:text-rose-500 cursor-pointer transition-colors"
+                    className="w-full flex items-center space-x-3 p-3 text-slate-400 hover:text-rose-500 cursor-pointer transition-colors rounded-lg hover:bg-slate-800/50"
                 >
                     <LogOut size={20} />
                     <span className="font-medium hidden md:block">Logout</span>

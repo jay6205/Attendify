@@ -44,6 +44,7 @@ import feedbackRoutes from './routes/feedbackRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
 import telegramRoutes from './routes/telegramRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 // Mount routers
 app.use('/api/v2/auth', authRoutes);
@@ -62,7 +63,9 @@ app.use('/api/v2/leaderboard', leaderboardRoutes);
 app.use('/api/v2/feedback', feedbackRoutes);
 app.use('/api/v2/users', userRoutes);
 app.use('/api/v2/alerts', alertRoutes);
+
 app.use('/api/v2/telegram', telegramRoutes);
+app.use('/api/v2/chat', chatRoutes); // New Rule-Based Chat
 
 
 // Root

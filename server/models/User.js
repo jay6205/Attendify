@@ -83,16 +83,44 @@ const userSchema = new mongoose.Schema({
             // Super admins technically don't belong to a single org, but everyone else DOES
             return this.role !== 'super_admin';
         }
-    }
+    },
+    // --- Parent Linkage ---
+    linkedChildren: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
 
-// Keep phoneRequired in sync with role on every save
+// Keep phoneRequired and linkedChildren in sync with role on every save
 userSchema.pre('save', function (next) {
     if (this.isModified('role')) {
         this.phoneRequired = (this.role === 'parent');
     }
+
+    // Validate linkedChildren
+    if (this.isModified('linkedChildren') || this.isModified('role')) {
+        if (this.role !== 'parent') {
+            this.linkedChildren = []; // Clear if not parent
+        } else if (this.linkedChildren && this.linkedChildren.length > 0) {
+            // Filter self-references and ensure uniqueness
+            const uniqueChildren = new Set();
+            this.linkedChildren = this.linkedChildren.filter(childId => {
+                if (!childId) return false;
+                const idStr = childId.toString();
+                // Prevent self-linking
+                if (idStr === this._id.toString()) return false;
+                // Ensure uniqueness
+                if (uniqueChildren.has(idStr)) return false;
+                uniqueChildren.add(idStr);
+                return true;
+            });
+        }
+    }
     next();
 });
+
+// Index for efficient parent lookup by child ID
+userSchema.index({ linkedChildren: 1 });
 
 // Keep phoneRequired in sync with role on atomic updates
 function syncPhoneRequiredOnUpdate() {

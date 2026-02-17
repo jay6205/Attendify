@@ -1,15 +1,31 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { Send, Bot, User, Sparkles } from 'lucide-react';
+import { Send, Bot, User, MessageSquare } from 'lucide-react';
 import api from '../api/axios';
 import AuthContext from '../context/AuthContext';
+
+const getInitialMessage = (user) => {
+    const name = user?.name?.split(' ')[0] || 'there';
+    const role = user?.role || 'student';
+
+    switch (role) {
+        case 'student':
+            return `Hello ${name}! I can help you with your attendance, marks, and upcoming tests. Try asking "What is my attendance?" or "Next test details".`;
+        case 'teacher':
+            return `Hello ${name}! I can assist you with identifying student trends. Try asking "Which students have low attendance?" or "Show weak students".`;
+        case 'parent':
+            return `Hello ${name}! I can help you track your child's progress. Try asking "Show my child's attendance" or "Latest test results".`;
+        default:
+            return `Hello ${name}! How can I assist you today?`;
+    }
+};
 
 const AIAdvisor = () => {
     const { user } = useContext(AuthContext);
     const [messages, setMessages] = useState([
-        { 
-            id: 1, 
-            sender: 'bot', 
-            text: `Hello ${user?.email?.split('@')[0] || 'Student'}! I'm your Attendify AI Advisor. I have access to your attendance records. Ask me anything—like "Can I bunk Maths tomorrow?" or "What acts as a safe buffer?"`
+        {
+            id: 1,
+            sender: 'bot',
+            text: getInitialMessage(user)
         }
     ]);
     const [input, setInput] = useState('');
@@ -28,8 +44,8 @@ const AIAdvisor = () => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const res = await api.get('/ai/history');
-                if (res.data.length > 0) {
+                const res = await api.get('/chat/history');
+                if (Array.isArray(res.data) && res.data.length > 0) {
                     setMessages(res.data);
                 }
             } catch (error) {
@@ -49,20 +65,19 @@ const AIAdvisor = () => {
         setLoading(true);
 
         try {
-            // Backend expects 'message', stick to that to ensure compatibility
-            const res = await api.post('/ai/chat', { message: userMessage.text });
-            const botMessage = { 
-                id: Date.now() + 1, 
-                sender: 'bot', 
-                text: res.data.response 
+            const res = await api.post('/chat/query', { message: userMessage.text });
+            const botMessage = {
+                id: Date.now() + 1,
+                sender: 'bot',
+                text: res.data.response
             };
             setMessages(prev => [...prev, botMessage]);
         } catch (error) {
-            console.error("AI Error:", error);
-            const errorMessage = { 
-                id: Date.now() + 1, 
-                sender: 'bot', 
-                text: "System Overload. I'm having trouble connecting right now."
+            console.error("Chat Error:", error);
+            const errorMessage = {
+                id: Date.now() + 1,
+                sender: 'bot',
+                text: "I'm having trouble accessing the records right now. Please try again later."
             };
             setMessages(prev => [...prev, errorMessage]);
         } finally {
@@ -76,49 +91,44 @@ const AIAdvisor = () => {
             <header className="mb-4">
                 <div className="flex items-center gap-3 mb-2">
                     <div className="p-3 bg-indigo-500/20 rounded-xl border border-indigo-500/30">
-                        <Sparkles className="text-indigo-400" size={24} />
+                        <MessageSquare className="text-indigo-400" size={24} />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-white">Attendify AI Advisor</h1>
+                        <h1 className="text-2xl font-bold text-white">Attendify Assistant</h1>
                         <p className="text-slate-400 text-sm flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             Online
                         </p>
                     </div>
                 </div>
-                <div className="text-xs text-amber-500/80 bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-lg inline-block">
-                    Disclaimer: I can help you plan bunks, but I am an AI. Verify calculations manually.
-                </div>
             </header>
 
             {/* Chat Container */}
             <div className="flex-1 bg-slate-800/50 rounded-2xl border border-slate-700 backdrop-blur-sm overflow-hidden flex flex-col shadow-xl">
-                
+
                 {/* Messages Area */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent">
                     {messages.map((msg) => (
-                        <div 
-                            key={msg.id} 
+                        <div
+                            key={msg.id}
                             className={`flex gap-4 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                         >
                             {/* Avatar */}
-                            <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center ${
-                                msg.sender === 'user' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-emerald-500/20 text-emerald-400'
-                            }`}>
+                            <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center ${msg.sender === 'user' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-emerald-500/20 text-emerald-400'
+                                }`}>
                                 {msg.sender === 'user' ? <User size={20} /> : <Bot size={20} />}
                             </div>
 
                             {/* Bubble */}
-                            <div className={`max-w-[80%] rounded-2xl p-4 text-sm leading-relaxed ${
-                                msg.sender === 'user' 
-                                    ? 'bg-indigo-600 text-white rounded-tr-none shadow-lg shadow-indigo-500/10' 
-                                    : 'bg-slate-700/50 text-slate-200 border border-slate-600 rounded-tl-none shadow-sm'
-                            }`}>
+                            <div className={`max-w-[80%] rounded-2xl p-4 text-sm leading-relaxed ${msg.sender === 'user'
+                                ? 'bg-indigo-600 text-white rounded-tr-none shadow-lg shadow-indigo-500/10'
+                                : 'bg-slate-700/50 text-slate-200 border border-slate-600 rounded-tl-none shadow-sm'
+                                }`}>
                                 {/* Render newlines as line breaks */}
-                                {msg.text.split('\n').map((line, i) => (
+                                {(msg.text ?? '').split('\n').map((line, i, arr) => (
                                     <React.Fragment key={i}>
                                         {line}
-                                        {i !== msg.text.split('\n').length - 1 && <br />}
+                                        {i !== arr.length - 1 && <br />}
                                     </React.Fragment>
                                 ))}
                             </div>
@@ -127,7 +137,7 @@ const AIAdvisor = () => {
 
                     {loading && (
                         <div className="flex gap-4">
-                             <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex-shrink-0 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex-shrink-0 flex items-center justify-center">
                                 <Bot size={20} />
                             </div>
                             <div className="bg-slate-700/50 border border-slate-600 rounded-2xl rounded-tl-none p-4 w-16 flex items-center justify-center gap-1">
@@ -143,28 +153,23 @@ const AIAdvisor = () => {
                 {/* Input Area */}
                 <div className="p-4 bg-slate-800/80 border-t border-slate-700">
                     <form onSubmit={handleSend} className="relative flex items-center gap-2">
-                        <div className="absolute left-4 opacity-50">
-                            <Sparkles size={18} className="text-indigo-400" />
-                        </div>
                         <input
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             placeholder="Ask about your attendance..."
-                            className="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3.5 pl-12 pr-12 text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-slate-500"
+                            className="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3.5 px-4 text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-slate-500"
                             disabled={loading}
                         />
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             disabled={!input.trim() || loading}
-                            className="absolute right-2 p-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/50 disabled:cursor-not-allowed text-white rounded-lg transition-colors shadow-lg shadow-indigo-600/20"
+                            aria-label="Send message"
+                            className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/50 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-colors shadow-lg shadow-indigo-600/20"
                         >
                             <Send size={18} />
                         </button>
                     </form>
-                    <div className="text-center mt-2 text-xs text-slate-500">
-                        AI can make mistakes. Please verify attendance policies with your university handbook.
-                    </div>
                 </div>
             </div>
         </div>

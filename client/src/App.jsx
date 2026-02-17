@@ -64,11 +64,8 @@ function App() {
             {/* Shared Student Pages */}
             <Route path="/student/marks" element={<MainLayout><StudentMarks /></MainLayout>} />
             <Route path="/student/performance" element={<MainLayout><MyPerformancePage /></MainLayout>} />
-            <Route path="/ai-advisor" element={<MainLayout><AIAdvisor /></MainLayout>} />
             <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
             <Route path="/student/leaves" element={<MainLayout><StudentLeaves /></MainLayout>} />
-            <Route path="/student/leaderboard/:assessmentId" element={<MainLayout><StudentLeaderboardPage /></MainLayout>} />
-            <Route path="/alerts" element={<MainLayout><AlertListPage /></MainLayout>} />
           </Route>
 
           {/* Teacher Routes */}
@@ -134,65 +131,74 @@ function App() {
                 <CreateFeedbackForm />
               </MainLayout>
             } />
-            <Route path="/alerts" element={<MainLayout><AlertListPage /></MainLayout>} />
           </Route>
 
-          {/* Admin Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-            <Route path="/admin" element={
-              <MainLayout>
-                <AdminDashboard />
-              </MainLayout>
-            } />
-            <Route path="/admin/system" element={
-              <MainLayout>
-                <Settings />
-              </MainLayout>
-            } />
-            <Route path="/admin/feedback/create" element={
-              <MainLayout>
-                <CreateFeedbackForm />
-              </MainLayout>
-            } />
-            <Route path="/admin/feedback" element={
-              <MainLayout>
-                <TeacherFeedbackSummary />
-              </MainLayout>
-            } />
-            <Route path="/alerts" element={<MainLayout><AlertListPage /></MainLayout>} />
-          </Route>
+        {/* Admin Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          <Route path="/admin" element={
+            <MainLayout>
+              <AdminDashboard />
+            </MainLayout>
+          } />
+          <Route path="/admin/system" element={
+            <MainLayout>
+              <Settings />
+            </MainLayout>
+          } />
+          <Route path="/admin/feedback/create" element={
+            <MainLayout>
+              <CreateFeedbackForm />
+            </MainLayout>
+          } />
+          <Route path="/admin/feedback" element={
+            <MainLayout>
+              <TeacherFeedbackSummary />
+            </MainLayout>
+          } />
+        </Route>
 
-          {/* Super Admin Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['super_admin']} />}>
-            <Route path="/super-admin" element={
-              <MainLayout>
-                <SuperAdminDashboard />
-              </MainLayout>
-            } />
-            <Route path="/super-admin/organizations" element={
-              <MainLayout>
-                <OrganizationManagementPage />
-              </MainLayout>
-            } />
-            <Route path="/super-admin/usage" element={
-              <MainLayout>
-                <UsageDashboard />
-              </MainLayout>
-            } />
-            <Route path="/super-admin/admins" element={
-              <MainLayout>
-                <AdminManagementPage />
-              </MainLayout>
-            } />
-          </Route>
+        {/* Shared Routes (Consolidated) */}
+        {/* Alerts - Student, Parent, Teacher, Admin */}
+        <Route element={<ProtectedRoute allowedRoles={['student', 'parent', 'teacher', 'admin']} />}>
+           <Route path="/alerts" element={<MainLayout><AlertListPage /></MainLayout>} />
+        </Route>
 
-          {/* Unauthorized / 404 */}
-          <Route path="/unauthorized" element={<div className="text-white p-10">Unauthorized Access</div>} />
-          <Route path="*" element={<Navigate to="/login/student" />} />
+        {/* AI Advisor - Student, Parent, Teacher */}
+        <Route element={<ProtectedRoute allowedRoles={['student', 'parent', 'teacher']} />}>
+           <Route path="/ai-advisor" element={<MainLayout><AIAdvisor /></MainLayout>} />
+        </Route>
 
-        </Routes>
-      </Router>
-    </AuthProvider>
+        {/* Super Admin Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['super_admin']} />}>
+          <Route path="/super-admin" element={
+            <MainLayout>
+              <SuperAdminDashboard />
+            </MainLayout>
+          } />
+          <Route path="/super-admin/organizations" element={
+            <MainLayout>
+              <OrganizationManagementPage />
+            </MainLayout>
+          } />
+          <Route path="/super-admin/usage" element={
+            <MainLayout>
+              <UsageDashboard />
+            </MainLayout>
+          } />
+          <Route path="/super-admin/admins" element={
+            <MainLayout>
+              <AdminManagementPage />
+            </MainLayout>
+          } />
+        </Route>
+
+        {/* Unauthorized / 404 */}
+        <Route path="/unauthorized" element={<div className="text-white p-10">Unauthorized Access</div>} />
+        <Route path="*" element={<Navigate to="/login/student" />} />
+
+      </Routes>
+    </Router>
+    </AuthProvider >
   );
 }
 
