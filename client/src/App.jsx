@@ -66,6 +66,7 @@ function App() {
             <Route path="/student/performance" element={<MainLayout><MyPerformancePage /></MainLayout>} />
             <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
             <Route path="/student/leaves" element={<MainLayout><StudentLeaves /></MainLayout>} />
+            <Route path="/student/leaderboard/:assessmentId" element={<MainLayout><StudentLeaderboardPage /></MainLayout>} />
           </Route>
 
           {/* Teacher Routes */}
@@ -195,7 +196,6 @@ function App() {
         {/* Unauthorized / 404 */}
         <Route path="/unauthorized" element={<div className="text-white p-10">Unauthorized Access</div>} />
         <Route path="*" element={<Navigate to="/login/student" />} />
-
       </Routes>
     </Router>
     </AuthProvider >
