@@ -9,7 +9,7 @@ import { createAlert } from '../services/alert.service.js';
 // @access  Private (Teacher)
 export const markAttendance = async (req, res) => {
     try {
-        const { studentId, courseId, date, status } = req.body;
+        const { studentId, courseId, date, status, startTime, endTime } = req.body;
 
         // 1. RBAC: Only Teachers can mark attendance
         if (req.user.role !== 'teacher') {
@@ -66,13 +66,16 @@ export const markAttendance = async (req, res) => {
             {
                 student: studentId,
                 course: courseId,
-                date: attendanceDate
+                date: attendanceDate,
+                startTime: startTime || null
             },
             {
                 student: studentId,
                 course: courseId,
                 semester: semester._id,
                 date: attendanceDate,
+                startTime: startTime || null,
+                endTime: endTime || null,
                 status: status,
                 markedBy: req.user._id
             },
@@ -84,13 +87,14 @@ export const markAttendance = async (req, res) => {
         // ALERT TRIGGER: notify student when marked absent (fire-and-forget)
         if (status === 'Absent' && course.organization) {
             const dateStr = attendanceDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            const timeSlot = startTime && endTime ? ` (${startTime} – ${endTime})` : '';
             createAlert(
                 studentId,
                 course.organization,
                 'ABSENT',
                 `Absent in ${course.name}`,
-                `You were marked absent in ${course.name} (${course.code}) on ${dateStr}.`,
-                { courseId, courseName: course.name, date: attendanceDate }
+                `You were marked absent in ${course.name} (${course.code}) on ${dateStr}${timeSlot}.`,
+                { courseId, courseName: course.name, date: attendanceDate, startTime, endTime }
             ).catch(err => console.error(`[AlertTrigger] Failed absence alert for student=${studentId} course=${course.name} date=${dateStr}:`, err.message));
         }
 
@@ -141,7 +145,7 @@ export const getAttendance = async (req, res) => {
 
         const attendance = await Attendance.find(query)
             .populate('student', 'name email details.studentId')
-            .sort({ date: -1 });
+            .sort({ date: -1, startTime: 1 });
 
         res.json(attendance);
 

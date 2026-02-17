@@ -11,6 +11,8 @@ const TeacherAttendance = () => {
     const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [startTime, setStartTime] = useState('09:00');
+    const [endTime, setEndTime] = useState('10:00');
     const [students, setStudents] = useState([]);
     const [attendanceMap, setAttendanceMap] = useState({}); // { studentId: 'Present' | 'Absent' }
     const [loading, setLoading] = useState(true);
@@ -42,7 +44,7 @@ const TeacherAttendance = () => {
         fetchCourses();
     }, [user]);
 
-    // 2. Fetch Students AND Existing Attendance when Course or Date Changes
+    // 2. Fetch Students AND Existing Attendance when Course, Date, or Time Changes
     useEffect(() => {
         if (!selectedCourse || !selectedDate) return;
 
@@ -52,17 +54,11 @@ const TeacherAttendance = () => {
                 // Parallel Fetch: Course Details (for students) & Existing Attendance (for status)
                 const [courseRes, attRes] = await Promise.all([
                     api.get(`/academic/courses/${selectedCourse}`),
-                    api.get(`/attendance/course/${selectedCourse}?date=${selectedDate}`) // Assuming query param support or client filtering
+                    api.get(`/attendance/course/${selectedCourse}?date=${selectedDate}`)
                 ]);
 
                 const courseStudents = courseRes.data.students || [];
                 setStudents(courseStudents);
-
-                // Process Existing Attendance
-                // attRes.data is array of attendance records.
-                // We need to map studentId -> status for the selected date.
-                // Note: The API /attendance/course/:id might return ALL history. 
-                // We should filter for selectedDate if backend doesn't support ?date query param.
 
                 const existingRecords = attRes.data || [];
                 const selectedDateStr = new Date(selectedDate).toISOString().split('T')[0];
@@ -70,13 +66,13 @@ const TeacherAttendance = () => {
                 const initialMap = {};
 
                 courseStudents.forEach(s => {
-                    // Find record for this student on this date
+                    // Find record for this student on this date AND matching time slot
                     const record = existingRecords.find(r => {
                         const rDate = new Date(r.date).toISOString().split('T')[0];
-                        return r.student._id === s._id && rDate === selectedDateStr;
+                        return r.student._id === s._id && rDate === selectedDateStr && r.startTime === startTime;
                     });
 
-                    initialMap[s._id] = record ? record.status : 'Present'; // Default to Present if no record
+                    initialMap[s._id] = record ? record.status : 'Present';
                 });
 
                 setAttendanceMap(initialMap);
@@ -89,7 +85,7 @@ const TeacherAttendance = () => {
         };
 
         fetchData();
-    }, [selectedCourse, selectedDate]);
+    }, [selectedCourse, selectedDate, startTime]);
 
     const handleToggle = (studentId) => {
         setAttendanceMap(prev => ({
@@ -114,6 +110,8 @@ const TeacherAttendance = () => {
                     studentId: student._id,
                     courseId: selectedCourse,
                     date: selectedDate,
+                    startTime,
+                    endTime,
                     status: attendanceMap[student._id]
                 });
             });
@@ -175,12 +173,33 @@ const TeacherAttendance = () => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-400 mb-2">Select Date</label>
+                        <label className="block text-sm font-medium text-slate-400 mb-2">Date</label>
                         <input
                             type="date"
                             value={selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
                             className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                            style={{ colorScheme: 'dark' }}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-400 mb-2">Start Time</label>
+                        <input
+                            type="time"
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                            style={{ colorScheme: 'dark' }}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-400 mb-2">End Time</label>
+                        <input
+                            type="time"
+                            value={endTime}
+                            onChange={(e) => setEndTime(e.target.value)}
+                            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                            style={{ colorScheme: 'dark' }}
                         />
                     </div>
                     <button

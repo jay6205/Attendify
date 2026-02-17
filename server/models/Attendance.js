@@ -21,6 +21,15 @@ const attendanceSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
+    // Lecture time slot (e.g. "13:00" – "14:00")
+    startTime: {
+        type: String,
+        default: null
+    },
+    endTime: {
+        type: String,
+        default: null
+    },
     status: {
         type: String,
         enum: ['Present', 'Absent', 'Leave'],
@@ -36,7 +45,7 @@ const attendanceSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Prevent duplicate attendance for the same student in the same course on the same date
-attendanceSchema.index({ student: 1, course: 1, date: 1 }, { unique: true });
+// Prevent duplicate attendance for the same student in the same course on the same date + time slot
+attendanceSchema.index({ student: 1, course: 1, date: 1, startTime: 1 }, { unique: true });
 
 export default mongoose.model('Attendance', attendanceSchema);

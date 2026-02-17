@@ -40,6 +40,15 @@ const userSchema = new mongoose.Schema({
         batch: { type: String }, // e.g. "2023-2027"
         currentSemester: { type: Number },
     },
+    // --- Telegram Integration ---
+    telegramChatId: {
+        type: String,
+        default: null
+    },
+    telegramLinked: {
+        type: Boolean,
+        default: false
+    },
     // --- Parent Phone Support ---
     phoneNumber: {
         type: String,

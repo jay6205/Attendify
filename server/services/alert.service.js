@@ -1,4 +1,56 @@
 import Alert from '../models/Alert.js';
+import User from '../models/User.js';
+import { sendTelegramMessage, buildTelegramMessage } from './telegram.service.js';
+
+// ─── Telegram Dispatch (fire-and-forget) ───────────────────────────────────────
+
+/**
+ * Send a Telegram message for a single user if they have Telegram linked.
+ * Runs async — never blocks the caller.
+ */
+const dispatchTelegramForUser = (userId, type, title, message, metadata) => {
+    // Intentionally NOT awaited — fire-and-forget
+    (async () => {
+        try {
+            const user = await User.findById(userId).select('telegramLinked telegramChatId').lean();
+            if (user?.telegramLinked && user?.telegramChatId) {
+                const text = buildTelegramMessage(type, title, message, metadata);
+                await sendTelegramMessage(user.telegramChatId, text);
+            }
+        } catch (err) {
+            console.error(`[AlertService] Telegram dispatch failed for user ${userId}:`, err.message);
+        }
+    })();
+};
+
+/**
+ * Send Telegram messages to multiple users who have Telegram linked.
+ * Runs async — never blocks the caller.
+ */
+const dispatchTelegramForBulk = (userIds, type, title, message, metadata) => {
+    // Intentionally NOT awaited — fire-and-forget
+    (async () => {
+        try {
+            const users = await User.find({
+                _id: { $in: userIds },
+                telegramLinked: true,
+                telegramChatId: { $ne: null }
+            }).select('telegramChatId').lean();
+
+            if (users.length === 0) return;
+
+            const text = buildTelegramMessage(type, title, message, metadata);
+            // Send in parallel, each independently caught
+            await Promise.allSettled(
+                users.map(u => sendTelegramMessage(u.telegramChatId, text))
+            );
+        } catch (err) {
+            console.error('[AlertService] Bulk Telegram dispatch failed:', err.message);
+        }
+    })();
+};
+
+// ─── Alert Creation ────────────────────────────────────────────────────────────
 
 /**
  * Create a single alert for a user.
@@ -14,6 +66,9 @@ export const createAlert = async (userId, orgId, type, title, message, metadata 
             message,
             metadata
         });
+
+        // Telegram delivery — async, non-blocking
+        dispatchTelegramForUser(userId, type, title, message, metadata);
     } catch (error) {
         console.error('[AlertService] Failed to create alert:', error.message);
     }
@@ -37,6 +92,9 @@ export const createBulkAlert = async (userIds, orgId, type, title, message, meta
         }));
 
         await Alert.insertMany(docs, { ordered: false });
+
+        // Telegram delivery — async, non-blocking
+        dispatchTelegramForBulk(userIds, type, title, message, metadata);
     } catch (error) {
         // For BulkWriteError, log but don't rethrow — some docs may have been inserted
         if (error.name === 'BulkWriteError' || error.name === 'MongoBulkWriteError') {
@@ -48,6 +106,8 @@ export const createBulkAlert = async (userIds, orgId, type, title, message, meta
             if (dupCount > 0) {
                 console.warn(`[AlertService] Bulk alert: ${dupCount} duplicate(s) skipped`);
             }
+            // Still dispatch Telegram even on partial failure — alerts may have been created
+            dispatchTelegramForBulk(userIds, type, title, message, metadata);
         } else {
             console.error('[AlertService] Failed to create bulk alerts:', error.message);
         }

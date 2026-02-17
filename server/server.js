@@ -1,4 +1,3 @@
-
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -44,6 +43,7 @@ import leaderboardRoutes from './routes/leaderboardRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
+import telegramRoutes from './routes/telegramRoutes.js';
 
 // Mount routers
 app.use('/api/v2/auth', authRoutes);
@@ -62,6 +62,7 @@ app.use('/api/v2/leaderboard', leaderboardRoutes);
 app.use('/api/v2/feedback', feedbackRoutes);
 app.use('/api/v2/users', userRoutes);
 app.use('/api/v2/alerts', alertRoutes);
+app.use('/api/v2/telegram', telegramRoutes);
 
 
 // Root
