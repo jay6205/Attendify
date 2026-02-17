@@ -26,7 +26,27 @@ export const markAttendance = async (req, res) => {
             return res.status(400).json({ message: 'Invalid status' });
         }
 
+        // Validate time slot if provided
+        const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
+        if (startTime || endTime) {
+            if (!startTime || !endTime) {
+                return res.status(400).json({ message: 'Both startTime and endTime are required if one is provided' });
+            }
+            if (!TIME_REGEX.test(startTime) || !TIME_REGEX.test(endTime)) {
+                return res.status(400).json({ message: 'Invalid time format. Use HH:mm (e.g. 09:00)' });
+            }
+            // Convert to minutes to compare
+            const [sH, sM] = startTime.split(':').map(Number);
+            const [eH, eM] = endTime.split(':').map(Number);
+            if (sH * 60 + sM >= eH * 60 + eM) {
+                return res.status(400).json({ message: 'startTime must be before endTime' });
+            }
+        }
+
         const attendanceDate = date ? new Date(date) : new Date();
+        if (isNaN(attendanceDate.getTime())) {
+            return res.status(400).json({ message: 'Invalid date format' });
+        }
         // Normalize date to remove time component for consistent unique checks
         attendanceDate.setHours(0, 0, 0, 0);
 
@@ -41,7 +61,7 @@ export const markAttendance = async (req, res) => {
         }
 
         // 4. Verify Student Enrollment
-        if (!course.students.includes(studentId)) {
+        if (!course.students.some(s => s.toString() === studentId)) {
             return res.status(400).json({ message: 'Student is not enrolled in this course' });
         }
 
@@ -126,12 +146,18 @@ export const getAttendance = async (req, res) => {
             }
             // Optional: Filter by specific student or date if query params provided
             if (req.query.studentId) query.student = req.query.studentId;
-            if (req.query.date) query.date = new Date(req.query.date);
+            if (req.query.date) {
+                const parsedDate = new Date(req.query.date);
+                if (isNaN(parsedDate.getTime())) {
+                    return res.status(400).json({ message: 'Invalid date query parameter' });
+                }
+                query.date = parsedDate;
+            }
 
         } else if (req.user.role === 'student') {
             // Student can ONLY see their OWN records
             // First, check enrollment? Not strictly necessary if we only show their data, but good practice.
-            if (!course.students.includes(req.user._id.toString())) {
+            if (!course.students.some(s => s.toString() === req.user._id.toString())) {
                 return res.status(403).json({ message: 'Not enrolled in this course' });
             }
             query.student = req.user._id;

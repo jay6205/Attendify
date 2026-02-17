@@ -12,9 +12,19 @@ dotenv.config();
 
 const MONGO_URI = process.env.MONGO_URI;
 
+if (!MONGO_URI) {
+    console.error('❌ MONGO_URI is not set in .env — cannot run migration');
+    process.exit(1);
+}
+
 async function migrate() {
-    await mongoose.connect(MONGO_URI);
-    console.log('Connected to MongoDB');
+    try {
+        await mongoose.connect(MONGO_URI);
+        console.log('Connected to MongoDB');
+    } catch (e) {
+        console.error('❌ Failed to connect to MongoDB:', e.message);
+        process.exit(1);
+    }
 
     const collection = mongoose.connection.collection('attendances');
 
@@ -34,7 +44,9 @@ async function migrate() {
         );
         console.log('✅ New index (student_1_course_1_date_1_startTime_1) created');
     } catch (e) {
-        console.log('⚠️  Index creation error:', e.message);
+        console.error('❌ Index creation failed:', e.message);
+        await mongoose.disconnect();
+        process.exit(1);
     }
 
     await mongoose.disconnect();

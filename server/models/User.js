@@ -43,7 +43,9 @@ const userSchema = new mongoose.Schema({
     // --- Telegram Integration ---
     telegramChatId: {
         type: String,
-        default: null
+        default: null,
+        unique: true,
+        sparse: true
     },
     telegramLinked: {
         type: Boolean,

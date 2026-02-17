@@ -7,7 +7,7 @@ const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOK
 /**
  * Send a message to a Telegram chat. Never throws — errors are logged only.
  * @param {string} chatId  - Telegram chat ID
- * @param {string} message - Text message (supports Telegram MarkdownV2 or plain text)
+ * @param {string} message - Text message (supports Telegram HTML or plain text)
  */
 export const sendTelegramMessage = async (chatId, message) => {
     try {
@@ -35,7 +35,10 @@ export const formatAbsentMessage = (courseName, date, startTime, endTime) => {
     if (date instanceof Date) {
         dateStr = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
     } else if (date) {
-        dateStr = new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        const parsed = new Date(date);
+        dateStr = isNaN(parsed.getTime())
+            ? new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+            : parsed.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
     } else {
         dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
     }

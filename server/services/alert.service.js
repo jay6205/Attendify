@@ -98,16 +98,21 @@ export const createBulkAlert = async (userIds, orgId, type, title, message, meta
     } catch (error) {
         // For BulkWriteError, log but don't rethrow — some docs may have been inserted
         if (error.name === 'BulkWriteError' || error.name === 'MongoBulkWriteError') {
-            const dupCount = (error.writeErrors || []).filter(e => e.code === 11000).length;
-            const otherErrors = (error.writeErrors || []).filter(e => e.code !== 11000);
+            const writeErrors = error.writeErrors || [];
+            const dupCount = writeErrors.filter(e => e.code === 11000).length;
+            const otherErrors = writeErrors.filter(e => e.code !== 11000);
             if (otherErrors.length > 0) {
                 console.error(`[AlertService] Bulk alert partial failure: ${otherErrors.length} non-duplicate errors`, otherErrors);
             }
             if (dupCount > 0) {
                 console.warn(`[AlertService] Bulk alert: ${dupCount} duplicate(s) skipped`);
             }
-            // Still dispatch Telegram even on partial failure — alerts may have been created
-            dispatchTelegramForBulk(userIds, type, title, message, metadata);
+            // Only dispatch Telegram for successfully inserted users
+            const failedIndices = new Set(writeErrors.map(e => e.index));
+            const successUserIds = userIds.filter((_, idx) => !failedIndices.has(idx));
+            if (successUserIds.length > 0) {
+                dispatchTelegramForBulk(successUserIds, type, title, message, metadata);
+            }
         } else {
             console.error('[AlertService] Failed to create bulk alerts:', error.message);
         }

@@ -25,9 +25,25 @@ if (!TOKEN) {
 const API = `https://api.telegram.org/bot${TOKEN}`;
 let offset = 0;
 
+// ─── Backoff for error retries ──────────────────────────────────────────────────
+let retryDelay = 1000; // start at 1s
+const MAX_RETRY_DELAY = 30000; // cap at 30s
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// ─── HTML Escape ────────────────────────────────────────────────────────────────
+const escapeHtml = (str) => {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+};
+
 async function getUpdates() {
     try {
         const res = await axios.get(`${API}/getUpdates`, {
+            timeout: 35000, // axios timeout slightly above Telegram's 30s long-poll
             params: {
                 offset,
                 timeout: 30, // long-poll for 30 seconds
@@ -41,10 +57,15 @@ async function getUpdates() {
             offset = update.update_id + 1;
             await handleUpdate(update);
         }
+
+        // Reset backoff on success
+        retryDelay = 1000;
     } catch (error) {
-        // Ignore timeout errors, log others
+        // Ignore timeout errors, log others and back off
         if (error.code !== 'ETIMEDOUT') {
             console.error('[Bot] Poll error:', error.message);
+            await sleep(retryDelay);
+            retryDelay = Math.min(retryDelay * 2, MAX_RETRY_DELAY);
         }
     }
 }
@@ -55,7 +76,8 @@ async function handleUpdate(update) {
 
     const chatId = message.chat.id;
     const text = message.text.trim();
-    const firstName = message.from?.first_name || 'there';
+    const rawFirstName = message.from?.first_name || 'there';
+    const firstName = escapeHtml(rawFirstName);
 
     if (text === '/start') {
         const reply =
@@ -65,7 +87,7 @@ async function handleUpdate(update) {
             `📋 Copy this ID and paste it in your Attendify Settings page to link your account.`;
 
         await sendMessage(chatId, reply);
-        console.log(`[Bot] Sent chat ID ${chatId} to ${firstName}`);
+        console.log(`[Bot] Sent chat ID ${chatId} to ${rawFirstName}`);
     } else {
         await sendMessage(chatId, 'ℹ️ I only send alerts from Attendify.\n\nUse /start to get your Chat ID.');
     }
