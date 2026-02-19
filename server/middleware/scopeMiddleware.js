@@ -20,7 +20,12 @@ export const attachOrganizationScope = async (req, res, next) => {
         }
 
         // Attach org ID to request object for easy access in controllers
-        req.organizationId = req.user.organization;
+        // Since authMiddleware might populate organization, checks if it's an object or ID
+        if (req.user.organization && typeof req.user.organization === 'object' && req.user.organization._id) {
+            req.organizationId = req.user.organization._id;
+        } else {
+            req.organizationId = req.user.organization;
+        }
         next();
     } catch (error) {
         console.error('Scope Middleware Error:', error);

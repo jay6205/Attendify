@@ -36,6 +36,10 @@ export const registerUser = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
+        if (typeof organizationCode !== 'string') {
+            return res.status(400).json({ message: 'Organization Code must be a string' });
+        }
+
         // Find Organization by Code
         const organization = await Organization.findOne({ code: organizationCode.toUpperCase() });
         

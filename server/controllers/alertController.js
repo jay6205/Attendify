@@ -13,6 +13,15 @@ export const getMyAlerts = async (req, res) => {
         const skip = (page - 1) * limit;
         const portal = req.query.portal || req.user.role; // fallback to role
 
+        // Env Super Admin has no DB ID or Org, so return empty
+        if (req.user.role === 'super_admin' || req.user._id === 'env-super-admin-id-001') {
+            return res.json({
+                alerts: [],
+                unreadCount: 0,
+                pagination: { page: 1, limit: limit, total: 0, pages: 1 }
+            });
+        }
+
         const filter = {
             user: req.user._id,
             organization: req.organizationId
