@@ -7,6 +7,7 @@ const Register = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [organizationCode, setOrganizationCode] = useState('');
     const [error, setError] = useState('');
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Register = () => {
         e.preventDefault();
         setError('');
         try {
-            await register(name, email, password);
+            await register(name, email, password, organizationCode);
             navigate('/');
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
@@ -47,6 +48,18 @@ const Register = () => {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">Organization Code</label>
+                        <input 
+                            type="text" 
+                            required
+                            className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors uppercase"
+                            placeholder="e.g. UNIV-2024"
+                            value={organizationCode}
+                            onChange={(e) => setOrganizationCode(e.target.value.toUpperCase())}
+                        />
+                         <p className="text-xs text-slate-500 mt-1">Ask your administrator for your organization code.</p>
+                    </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-2">Full Name</label>
                         <input 

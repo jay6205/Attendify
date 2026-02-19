@@ -24,7 +24,7 @@ export const protect = async (req, res, next) => {
                 };
             } else {
                 // Get user from the token (Database)
-                req.user = await User.findById(decoded.id).select('-passwordHash');
+                req.user = await User.findById(decoded.id).select('-passwordHash').populate('organization');
             }
 
             // Ensure user valid (if DB lookup returned null)

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Shield, Activity, Server } from 'lucide-react';
+import { Users, Shield, Activity, Server, Building2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const StatCard = ({ icon: Icon, label, value, color }) => (
@@ -39,6 +39,14 @@ const SuperAdminDashboard = () => {
                         color="bg-emerald-500 text-emerald-500" 
                     />
                 </Link>
+                 <Link to="/super-admin/organizations">
+                    <StatCard 
+                        icon={Building2} 
+                        label="Organizations" 
+                        value="Manage" 
+                        color="bg-indigo-500 text-indigo-500" 
+                    />
+                </Link>
                 <StatCard 
                     icon={Server} 
                     label="System Status" 
@@ -68,6 +76,12 @@ const SuperAdminDashboard = () => {
                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium"
                     >
                         Manage Administrators
+                    </Link>
+                    <Link 
+                        to="/super-admin/organizations"
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium"
+                    >
+                        Manage Organizations
                     </Link>
                     {/* Placeholder buttons for future features */}
                     <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-medium cursor-not-allowed opacity-50">

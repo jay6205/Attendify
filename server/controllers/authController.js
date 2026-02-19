@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
+import Organization from '../models/Organization.js';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -22,10 +23,10 @@ export const generateToken = (id, role) => {
 // @access  Public
 export const registerUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, organizationCode } = req.body;
 
-        if (!name || !email || !password) {
-            return res.status(400).json({ message: 'Please add all fields' });
+        if (!name || !email || !password || !organizationCode) {
+            return res.status(400).json({ message: 'Please add all fields, including Organization Code' });
         }
 
         // Check if user exists
@@ -33,6 +34,13 @@ export const registerUser = async (req, res) => {
 
         if (userExists) {
             return res.status(400).json({ message: 'User already exists' });
+        }
+
+        // Find Organization by Code
+        const organization = await Organization.findOne({ code: organizationCode.toUpperCase() });
+        
+        if (!organization) {
+            return res.status(400).json({ message: 'Invalid Organization Code' });
         }
 
         // Hash password
@@ -44,6 +52,8 @@ export const registerUser = async (req, res) => {
             name,
             email,
             passwordHash: hashedPassword,
+            organization: organization._id,
+            role: 'student' // Explicitly set default role, though schema does it too
         });
 
         if (user) {
@@ -51,6 +61,7 @@ export const registerUser = async (req, res) => {
                 _id: user.id,
                 email: user.email,
                 role: user.role, // Include role
+                organization: user.organization,
                 token: generateToken(user._id, user.role),
             });
         } else {
@@ -88,7 +99,7 @@ export const loginUser = async (req, res) => {
     }
 
     // 2. Check for Database User
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate('organization');
 
     // ... existing loginUser code ...
     if (user && (await bcrypt.compare(password, user.passwordHash))) {
@@ -99,6 +110,7 @@ export const loginUser = async (req, res) => {
             _id: user.id,
             email: user.email,
             role: user.role, // Ensure role is sent (helps frontend)
+            organization: user.organization, // Include populated org details (especially code)
             token: generateToken(user._id, user.role),
         };
 

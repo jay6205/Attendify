@@ -115,7 +115,14 @@ const AdminDashboard = () => {
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent mb-1">
                         Admin Portal
                     </h1>
-                    <p className="text-slate-400">Manage system resources and enrollments.</p>
+                    <div className="flex items-center gap-4 text-slate-400">
+                        <p>Manage system resources and enrollments.</p>
+                        {user?.organization && (
+                            <span className="bg-slate-700/50 px-3 py-1 rounded-full text-indigo-300 text-sm border border-slate-600">
+                                Org Code: <span className="font-mono font-bold text-white">{user.organization.code || 'N/A'}</span>
+                            </span>
+                        )}
+                    </div>
                 </header>
 
                 {/* Tabs */}
