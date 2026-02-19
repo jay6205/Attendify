@@ -1,12 +1,16 @@
 import React, { useContext } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, CheckSquare, FileText, BarChart, Plus, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import PageTransition from '../components/PageTransition';
 
 // Feature Card Component
-const FeatureCard = ({ title, description, icon: Icon, color, actionLabel }) => (
-    <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/80 transition-all group">
+const FeatureCard = ({ title, description, icon: Icon, color, actionLabel, onClick }) => (
+    <div 
+        onClick={onClick}
+        className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/80 transition-all group cursor-pointer"
+    >
         <div className={`p-3 rounded-lg w-fit mb-4 ${color} bg-opacity-10`}>
             <Icon size={24} className={color.replace('bg-', 'text-')} />
         </div>
@@ -20,6 +24,7 @@ const FeatureCard = ({ title, description, icon: Icon, color, actionLabel }) => 
 
 const TeacherDashboard = () => {
     const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const container = {
         hidden: { opacity: 0 },
@@ -68,6 +73,7 @@ const TeacherDashboard = () => {
                             icon={BookOpen}
                             color="text-emerald-400"
                             actionLabel="View Courses"
+                            onClick={() => navigate('/teacher/courses')}
                         />
                     </motion.div>
 
@@ -78,6 +84,7 @@ const TeacherDashboard = () => {
                             icon={CheckSquare}
                             color="text-blue-400"
                             actionLabel="Start Marking"
+                            onClick={() => navigate('/teacher/attendance')}
                         />
                     </motion.div>
 
@@ -88,6 +95,7 @@ const TeacherDashboard = () => {
                             icon={FileText}
                             color="text-amber-400"
                             actionLabel="View Pending"
+                            onClick={() => navigate('/teacher/leaves')}
                         />
                     </motion.div>
 
@@ -98,6 +106,7 @@ const TeacherDashboard = () => {
                             icon={BarChart}
                             color="text-purple-400"
                             actionLabel="View Report"
+                            onClick={() => navigate('/teacher/summary')}
                         />
                     </motion.div>
 
@@ -108,6 +117,18 @@ const TeacherDashboard = () => {
                             icon={MessageSquare}
                             color="text-cyan-400"
                             actionLabel="View Feedback"
+                            onClick={() => navigate('/teacher/feedback')}
+                        />
+                    </motion.div>
+
+                     <motion.div variants={item}>
+                        <FeatureCard
+                            title="Question Paper"
+                            description="Create and generate question papers using AI."
+                            icon={FileText}
+                            color="text-pink-400"
+                            actionLabel="Create Paper"
+                            onClick={() => navigate('/teacher/question-paper/create')}
                         />
                     </motion.div>
                 </motion.div>

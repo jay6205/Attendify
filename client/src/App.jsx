@@ -30,6 +30,9 @@ import StudentLeaderboardPage from './pages/student/AssessmentLeaderboardPage';
 import TeacherLeaderboardPage from './pages/teacher/AssessmentLeaderboardPage';
 import TeacherFeedbackSummary from './pages/TeacherFeedbackSummary';
 import CreateFeedbackForm from './pages/CreateFeedbackForm';
+import QuestionPaperBuilderPage from './pages/teacher/QuestionPaperBuilderPage';
+
+
 
 // Future Pages
 import AIAdvisor from './pages/AIAdvisor';
@@ -130,6 +133,11 @@ function App() {
             <Route path="/teacher/feedback/create" element={
               <MainLayout>
                 <CreateFeedbackForm />
+              </MainLayout>
+            } />
+            <Route path="/teacher/question-paper/create" element={
+              <MainLayout>
+                <QuestionPaperBuilderPage />
               </MainLayout>
             } />
           </Route>

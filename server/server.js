@@ -67,6 +67,9 @@ app.use('/api/v2/alerts', alertRoutes);
 app.use('/api/v2/telegram', telegramRoutes);
 app.use('/api/v2/chat', chatRoutes); // New Rule-Based Chat
 
+import questionPaperRoutes from './routes/questionPaperRoutes.js';
+app.use('/api/v2/question-paper', questionPaperRoutes);
+
 
 // Root
 app.get('/', (req, res) => {

@@ -50,7 +50,8 @@ const Sidebar = () => {
             { icon: BarChart, label: "Summary", path: "/teacher/summary" },
             { icon: MessageSquare, label: "Feedback", path: "/teacher/feedback" },
             { icon: MessageSquare, label: "Create Feedback", path: "/teacher/feedback/create" },
-            { icon: Bot, label: "AI Advisor", path: "/ai-advisor" }
+            { icon: Bot, label: "AI Advisor", path: "/ai-advisor" },
+            { icon: FileText, label: "Question Paper", path: "/teacher/question-paper/create" }
         ],
         admin: [
             { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
