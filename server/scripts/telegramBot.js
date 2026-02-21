@@ -17,12 +17,12 @@ dotenv.config();
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
-if (!TOKEN) {
-    console.error('❌ TELEGRAM_BOT_TOKEN not set in .env');
-    process.exit(1);
+let API;
+if (TOKEN) {
+    API = `https://api.telegram.org/bot${TOKEN}`;
+} else {
+    console.warn('⚠️ TELEGRAM_BOT_TOKEN not set in .env. Bot will not start.');
 }
-
-const API = `https://api.telegram.org/bot${TOKEN}`;
 let offset = 0;
 
 // ─── Backoff for error retries ──────────────────────────────────────────────────
@@ -107,9 +107,6 @@ async function sendMessage(chatId, text) {
 
 // ─── Main Loop ─────────────────────────────────────────────────────────────────
 
-console.log('🤖 Attendify Telegram Bot started (polling mode)');
-console.log('   Waiting for messages...\n');
-
 // First, remove any existing webhook so polling works
 async function clearWebhook() {
     try {
@@ -120,12 +117,19 @@ async function clearWebhook() {
     }
 }
 
-async function start() {
-    await clearWebhook();
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-        await getUpdates();
-    }
-}
+export const startTelegramBot = async () => {
+    if (!TOKEN) return; // Silent abort if no token in env
 
-start();
+    console.log('🤖 Attendify Telegram Bot started (polling mode)');
+    console.log('   Waiting for messages...\n');
+
+    await clearWebhook();
+
+    // Fire and forget polling loop
+    (async () => {
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+            await getUpdates();
+        }
+    })();
+};

@@ -10,6 +10,7 @@ import './config/passport.js'; // Passport config
 import { globalLimiter, authLimiter, chatLimiter } from './middleware/rateLimiter.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import logger from './utils/logger.js';
+import { startTelegramBot } from './scripts/telegramBot.js';
 
 // Load env vars
 dotenv.config();
@@ -133,4 +134,7 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     logger.info(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+
+    // Start Telegram Bot polling asynchronously side-by-side with web server
+    startTelegramBot();
 });
