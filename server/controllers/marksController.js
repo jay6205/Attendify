@@ -54,7 +54,10 @@ export const createAssessment = async (req, res) => {
 // @access  Teacher
 export const getTeacherAssessments = async (req, res) => {
     try {
-        const assessments = await Assessment.find({ teacher: req.user._id })
+        const assessments = await Assessment.find({ 
+            teacher: req.user._id,
+            organization: req.user.organization // FIX: Tenant scoped
+        })
             .populate('course', 'name code')
             .sort({ date: -1 });
 

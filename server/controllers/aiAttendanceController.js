@@ -85,10 +85,10 @@ export const submitAnswer = async (req, res) => {
             if (submission.status === 'Approved') {
                 return res.status(400).json({ message: 'Attendance already marked (Approved).' });
             }
-            
+
             // B. If pending, block (wait for result).
             if (submission.status === 'Pending') {
-                 return res.status(400).json({ message: 'Previous submission is still pending.' });
+                return res.status(400).json({ message: 'Previous submission is still pending.' });
             }
 
             // C. If rejected, check attempts.
@@ -96,7 +96,7 @@ export const submitAnswer = async (req, res) => {
                 if (submission.attempts >= RETRY_LIMIT) {
                     return res.status(400).json({ message: `Max attempts (${RETRY_LIMIT}) reached.` });
                 }
-                
+
                 // Allow Retry: Update existing submission
                 submission.answer = answer;
                 submission.status = 'Pending';
@@ -106,7 +106,7 @@ export const submitAnswer = async (req, res) => {
 
                 // Trigger Validation again
                 const result = await processSubmission(submission._id);
-                
+
                 return res.json({
                     message: 'Retry submitted',
                     status: result.status,
@@ -123,10 +123,10 @@ export const submitAnswer = async (req, res) => {
                 status: 'Pending',
                 attempts: 1
             });
-    
+
             // 6. Trigger Validation
             const result = await processSubmission(submission._id);
-    
+
             return res.status(201).json({
                 message: 'Submission received',
                 status: result.status,
@@ -148,15 +148,15 @@ export const stopSession = async (req, res) => {
     try {
         const { sessionId } = req.body;
         const session = await AttendanceSession.findById(sessionId);
-        
+
         if (!session) {
             console.error(`[StopSession] Session not found: ${sessionId}`);
             return res.status(404).json({ message: 'Session not found' });
         }
-        
+
         // Ownership
         if (session.teacher.toString() !== req.user._id.toString()) {
-             return res.status(403).json({ message: 'Not authorized' });
+            return res.status(403).json({ message: 'Not authorized' });
         }
 
         if (!session.isActive) {
@@ -172,7 +172,7 @@ export const stopSession = async (req, res) => {
         console.log(`[StopSession] Session marked inactive.`);
 
         // 2. Finalize Attendance: Mark Absentees
-        
+
         // A. Get All Enrolled Students
         const course = await Course.findById(session.course).populate('semester');
         if (!course) return res.status(404).json({ message: 'Course not found' });
@@ -183,8 +183,8 @@ export const stopSession = async (req, res) => {
         // B. Get All Present Students
         // We look for Attendance records for this Course + Date (normalized).
         const attendanceDate = new Date(session.createdAt);
-        attendanceDate.setHours(0,0,0,0);
-        
+        attendanceDate.setHours(0, 0, 0, 0);
+
         console.log(`[StopSession] Looking for Present records on Date: ${attendanceDate.toISOString()}`);
 
         const Attendance = (await import('../models/Attendance.js')).default;
@@ -248,6 +248,18 @@ export const stopSession = async (req, res) => {
 export const getActiveSession = async (req, res) => {
     try {
         const { courseId } = req.params;
+
+        // FIX: Verify student is actually enrolled before leaking session presence
+        const course = await Course.findOne({
+            _id: courseId,
+            organization: req.user.organization,
+            students: req.user._id
+        });
+
+        if (!course) {
+            return res.status(403).json({ message: 'Not enrolled in this course' });
+        }
+
         const session = await AttendanceSession.findOne({
             course: courseId,
             isActive: true,
@@ -288,17 +300,17 @@ export const getSessionStats = async (req, res) => {
                 $group: {
                     _id: null,
                     totalSubmitted: { $sum: 1 },
-                    approved: { 
-                        $sum: { $cond: [{ $eq: ['$status', 'Approved'] }, 1, 0] } 
+                    approved: {
+                        $sum: { $cond: [{ $eq: ['$status', 'Approved'] }, 1, 0] }
                     },
-                    rejected: { 
-                        $sum: { $cond: [{ $eq: ['$status', 'Rejected'] }, 1, 0] } 
+                    rejected: {
+                        $sum: { $cond: [{ $eq: ['$status', 'Rejected'] }, 1, 0] }
                     },
-                    pending: { 
-                        $sum: { $cond: [{ $eq: ['$status', 'Pending'] }, 1, 0] } 
+                    pending: {
+                        $sum: { $cond: [{ $eq: ['$status', 'Pending'] }, 1, 0] }
                     },
-                    failed: { 
-                        $sum: { $cond: [{ $eq: ['$status', 'Failed'] }, 1, 0] } 
+                    failed: {
+                        $sum: { $cond: [{ $eq: ['$status', 'Failed'] }, 1, 0] }
                     }
                 }
             }

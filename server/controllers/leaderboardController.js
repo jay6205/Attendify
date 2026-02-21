@@ -37,6 +37,9 @@ export const getAssessmentLeaderboard = async (req, res) => {
 
         const role = req.user.role;
         const course = assessment.course;
+        if (!course) {
+            return res.status(404).json({ message: 'Course not found' });
+        }
 
         // RBAC validation
         if (role === 'student') {

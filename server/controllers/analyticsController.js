@@ -39,6 +39,7 @@ export const getDashboard = async (req, res) => {
             // Note: This is an expensive loop query practice, aggregation is better but this is simpler for MVP with low data volume
             const logs = await mongoose.model('AttendanceLog').find({
                 userId,
+                organizationId: req.user.organization, // FIX: Multi-tenant safety
                 date: { $gte: start.toDate(), $lte: end.toDate() },
                 status: { $in: ['Present', 'Absent'] } // Ignore Cancelled
             });
@@ -57,7 +58,10 @@ export const getDashboard = async (req, res) => {
         }
 
         // 3. Subject Data (Bar Chart)
-        const subjectsRaw = await Subject.find({ userId });
+        const subjectsRaw = await Subject.find({
+            userId,
+            organizationId: req.user.organization // FIX: Multi-tenant safety
+        });
         const subjects = subjectsRaw.map(sub => ({
             name: sub.name,
             Attended: sub.attended,

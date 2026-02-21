@@ -94,16 +94,22 @@ export const updateSemester = async (req, res) => {
             return res.status(403).json({ message: 'Access denied: Admins only' });
         }
 
-        const { status } = req.body;
+        const { status, name, startDate, endDate } = req.body;
         const validStatuses = ['upcoming', 'active', 'completed', 'archived'];
 
         if (status && !validStatuses.includes(status)) {
             return res.status(400).json({ message: 'Invalid status' });
         }
 
+        const updateData = {};
+        if (name !== undefined) updateData.name = name;
+        if (startDate !== undefined) updateData.startDate = startDate;
+        if (endDate !== undefined) updateData.endDate = endDate;
+        if (status !== undefined) updateData.status = status;
+
         const semester = await Semester.findOneAndUpdate(
             { _id: req.params.id, organization: req.user.organization }, // FIX: Verify org ownership
-            req.body,
+            updateData,
             { new: true, runValidators: true }
         );
 

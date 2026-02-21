@@ -5,7 +5,7 @@ const semesterSchema = new mongoose.Schema({
     organization: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Organization',
-        required: true
+        required: true, index: true,
     },
     name: {
         type: String,

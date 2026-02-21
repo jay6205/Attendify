@@ -3,9 +3,12 @@ import Course from '../models/Course.js';
 
 // @desc    Get single course by ID (with students)
 // @route   GET /api/v2/academic/courses/:id
-// @access  Public/Authenticated
+// @access  Private
 export const getCourseById = async (req, res) => {
     try {
+        if (!req.user || !req.user.organization) {
+            return res.status(401).json({ message: 'Authentication required' });
+        }
         const course = await Course.findOne({
             _id: req.params.id,
             organization: req.user.organization
@@ -27,9 +30,12 @@ export const getCourseById = async (req, res) => {
 
 // @desc    Get all semesters
 // @route   GET /api/v2/academic/semesters
-// @access  Public/Authenticated
+// @access  Private
 export const getAllSemesters = async (req, res) => {
     try {
+        if (!req.user || !req.user.organization) {
+            return res.status(401).json({ message: 'Authentication required' });
+        }
         const semesters = await Semester.find({
             organization: req.user.organization
         }).sort({ startDate: -1 });
@@ -42,9 +48,12 @@ export const getAllSemesters = async (req, res) => {
 
 // @desc    Get all courses (optional filter by semester)
 // @route   GET /api/v2/academic/courses
-// @access  Public/Authenticated
+// @access  Private
 export const getAllCourses = async (req, res) => {
     try {
+        if (!req.user || !req.user.organization) {
+            return res.status(401).json({ message: 'Authentication required' });
+        }
         const query = { organization: req.user.organization };
         if (req.query.semesterId) {
             query.semester = req.query.semesterId;
