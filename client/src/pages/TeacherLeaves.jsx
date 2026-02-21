@@ -63,7 +63,7 @@ const TeacherLeaves = () => {
                 ) : (
                     <div className="grid grid-cols-1 gap-4">
                         {requests.map(req => (
-                            <div key={req._id} className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 backdrop-blur-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all hover:border-indigo-500/30">
+                            <div key={req._id} className="bg-slate-800/50 p-4 sm:p-6 rounded-2xl border border-slate-700/50 backdrop-blur-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6 transition-all hover:border-indigo-500/30">
                                 {/* Info Section */}
                                 <div className="space-y-3 flex-1">
                                     <div className="flex items-start justify-between">

@@ -148,23 +148,23 @@ const TeacherAttendance = () => {
                     </p>
                 </header>
 
-                
+
 
                 {activeSessionId && (
-                    <TeacherActiveSessionWidget 
-                        sessionId={activeSessionId} 
-                        onClose={() => setActiveSessionId(null)} 
+                    <TeacherActiveSessionWidget
+                        sessionId={activeSessionId}
+                        onClose={() => setActiveSessionId(null)}
                     />
                 )}
 
                 {/* Controls */}
-                <div className="flex flex-col md:flex-row gap-4 bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 items-end">
+                <div className="flex flex-col md:flex-row gap-3 sm:gap-4 bg-slate-800/50 p-4 sm:p-6 rounded-2xl border border-slate-700/50 md:items-end">
                     <div className="flex-1 w-full">
-                        <label className="block text-sm font-medium text-slate-400 mb-2">Select Course</label>
+                        <label className="block text-xs sm:text-sm font-medium text-slate-400 mb-1.5 sm:mb-2">Select Course</label>
                         <select
                             value={selectedCourse}
                             onChange={(e) => setSelectedCourse(e.target.value)}
-                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
                         >
                             <option value="" disabled>Select a course...</option>
                             {courses.map(c => (
@@ -172,40 +172,42 @@ const TeacherAttendance = () => {
                             ))}
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-400 mb-2">Date</label>
-                        <input
-                            type="date"
-                            value={selectedDate}
-                            onChange={(e) => setSelectedDate(e.target.value)}
-                            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
-                            style={{ colorScheme: 'dark' }}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-400 mb-2">Start Time</label>
-                        <input
-                            type="time"
-                            value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
-                            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
-                            style={{ colorScheme: 'dark' }}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-400 mb-2">End Time</label>
-                        <input
-                            type="time"
-                            value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
-                            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
-                            style={{ colorScheme: 'dark' }}
-                        />
+                    <div className="grid grid-cols-2 md:flex md:flex-row gap-3 sm:gap-4 w-full md:w-auto">
+                        <div className="w-full md:w-auto">
+                            <label className="block text-xs sm:text-sm font-medium text-slate-400 mb-1.5 sm:mb-2">Date</label>
+                            <input
+                                type="date"
+                                value={selectedDate}
+                                onChange={(e) => setSelectedDate(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                                style={{ colorScheme: 'dark' }}
+                            />
+                        </div>
+                        <div className="w-full md:w-auto">
+                            <label className="block text-xs sm:text-sm font-medium text-slate-400 mb-1.5 sm:mb-2">Start Time</label>
+                            <input
+                                type="time"
+                                value={startTime}
+                                onChange={(e) => setStartTime(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                                style={{ colorScheme: 'dark' }}
+                            />
+                        </div>
+                        <div className="w-full md:w-auto col-span-2 sm:col-span-1">
+                            <label className="block text-xs sm:text-sm font-medium text-slate-400 mb-1.5 sm:mb-2">End Time</label>
+                            <input
+                                type="time"
+                                value={endTime}
+                                onChange={(e) => setEndTime(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                                style={{ colorScheme: 'dark' }}
+                            />
+                        </div>
                     </div>
                     <button
                         onClick={() => setShowAiModal(true)}
                         disabled={!selectedCourse}
-                        className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-6 py-2.5 rounded-lg font-medium shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                        className="w-full md:w-auto mt-2 md:mt-0 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-6 py-2 sm:py-2.5 rounded-lg font-medium shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex justify-center items-center gap-2"
                     >
                         <Brain size={18} />
                         Start AI Session
@@ -224,15 +226,15 @@ const TeacherAttendance = () => {
                     <div className="flex justify-center p-10"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-indigo-500"></div></div>
                 ) : students.length > 0 ? (
                     <div className="bg-slate-800/30 rounded-2xl border border-slate-700/50 overflow-hidden">
-                        <div className="p-4 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/50">
+                        <div className="p-3 sm:p-4 border-b border-slate-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-800/50">
                             <h3 className="font-semibold text-slate-200 flex items-center gap-2">
                                 <Users size={18} /> Class List ({students.length})
                             </h3>
-                            <div className="flex gap-2">
-                                <button onClick={() => handleMarkAll('Present')} className="text-xs bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded hover:bg-emerald-500/20 transition-colors">
+                            <div className="flex gap-2 w-full sm:w-auto">
+                                <button onClick={() => handleMarkAll('Present')} className="flex-1 sm:flex-none text-center text-xs bg-emerald-500/10 text-emerald-400 px-3 py-2 sm:py-1.5 rounded hover:bg-emerald-500/20 transition-colors">
                                     Mark All Present
                                 </button>
-                                <button onClick={() => handleMarkAll('Absent')} className="text-xs bg-rose-500/10 text-rose-400 px-3 py-1.5 rounded hover:bg-rose-500/20 transition-colors">
+                                <button onClick={() => handleMarkAll('Absent')} className="flex-1 sm:flex-none text-center text-xs bg-rose-500/10 text-rose-400 px-3 py-2 sm:py-1.5 rounded hover:bg-rose-500/20 transition-colors">
                                     Mark All Absent
                                 </button>
                             </div>
@@ -240,16 +242,16 @@ const TeacherAttendance = () => {
 
                         <div className="divide-y divide-slate-700/50">
                             {students.map(student => (
-                                <div key={student._id} className="p-4 flex items-center justify-between hover:bg-slate-800/50 transition-colors">
-                                    <div>
-                                        <p className="font-medium text-slate-200">{student.name}</p>
-                                        <p className="text-xs text-slate-500">{student.email} • {student.details?.studentId || 'No ID'}</p>
+                                <div key={student._id} className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-slate-800/50 transition-colors gap-3">
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-medium text-slate-200 truncate">{student.name}</p>
+                                        <p className="text-xs text-slate-500 truncate">{student.email} • {student.details?.studentId || 'No ID'}</p>
                                     </div>
                                     <button
                                         onClick={() => handleToggle(student._id)}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${attendanceMap[student._id] === 'Present'
-                                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                                : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                        className={`flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg font-medium transition-all shrink-0 ${attendanceMap[student._id] === 'Present'
+                                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                                             }`}
                                     >
                                         {attendanceMap[student._id] === 'Present' ? <CheckCircle size={18} /> : <XCircle size={18} />}
@@ -259,11 +261,11 @@ const TeacherAttendance = () => {
                             ))}
                         </div>
 
-                        <div className="p-6 bg-slate-800/50 border-t border-slate-700/50 flex justify-end">
+                        <div className="p-4 sm:p-6 bg-slate-800/50 border-t border-slate-700/50 flex justify-end">
                             <button
                                 onClick={handleSubmit}
                                 disabled={submitting}
-                                className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition-all ${submitting ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'}`}
+                                className={`flex w-full sm:w-auto items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition-all ${submitting ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'}`}
                             >
                                 {submitting ? (
                                     <>Saving...</>
@@ -279,16 +281,16 @@ const TeacherAttendance = () => {
                         <p>No students enrolled in this course.</p>
                     </div>
                 )}
-            {showAiModal && (
-                <TeacherSessionModal 
-                    courseId={selectedCourse}
-                    onClose={() => setShowAiModal(false)}
-                    onSuccess={(sessionId) => {
-                        setMsg({ type: 'success', text: 'AI Session Started Successfully!' });
-                        if (sessionId) setActiveSessionId(sessionId);
-                    }}
-                />
-            )}
+                {showAiModal && (
+                    <TeacherSessionModal
+                        courseId={selectedCourse}
+                        onClose={() => setShowAiModal(false)}
+                        onSuccess={(sessionId) => {
+                            setMsg({ type: 'success', text: 'AI Session Started Successfully!' });
+                            if (sessionId) setActiveSessionId(sessionId);
+                        }}
+                    />
+                )}
             </div>
         </PageTransition>
     );

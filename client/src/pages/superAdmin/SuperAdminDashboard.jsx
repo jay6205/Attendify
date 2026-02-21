@@ -73,21 +73,21 @@ const SuperAdminDashboard = () => {
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
                     <Link
                         to="/super-admin/admins"
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium text-center text-sm sm:text-base w-full sm:w-auto"
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium text-center sm:text-left w-full sm:w-auto"
                     >
                         Manage Administrators
                     </Link>
                     <Link
                         to="/super-admin/organizations"
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium text-center text-sm sm:text-base w-full sm:w-auto"
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium text-center sm:text-left w-full sm:w-auto"
                     >
                         Manage Organizations
                     </Link>
                     {/* Placeholder buttons for future features */}
-                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-medium cursor-not-allowed opacity-50 text-center text-sm sm:text-base w-full sm:w-auto">
+                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-medium cursor-not-allowed opacity-50 text-center sm:text-left w-full sm:w-auto">
                         System Logs
                     </button>
-                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-medium cursor-not-allowed opacity-50 text-center text-sm sm:text-base w-full sm:w-auto">
+                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-medium cursor-not-allowed opacity-50 text-center sm:text-left w-full sm:w-auto">
                         Database Maintenance
                     </button>
                 </div>

@@ -138,7 +138,7 @@ const UsageDashboard = () => {
                         </h2>
                     </div>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[600px]">
+                        <table className="w-full text-left text-xs sm:text-base border-collapse min-w-[600px]">
                             <thead>
                                 <tr className="bg-slate-900/50 text-slate-400">
                                     <th className="p-2 sm:p-3 font-medium">Organization</th>
@@ -184,8 +184,8 @@ const UsageDashboard = () => {
                                                 <td className="p-2 sm:p-3 text-center text-slate-300 hidden md:table-cell">{m?.academic?.assessments || 0}</td>
                                                 <td className="p-2 sm:p-3 text-center">
                                                     <span className={`text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full ${(m?.growth?.studentsLast30Days || 0) > 0
-                                                            ? 'bg-emerald-500/10 text-emerald-400'
-                                                            : 'bg-slate-700 text-slate-400'
+                                                        ? 'bg-emerald-500/10 text-emerald-400'
+                                                        : 'bg-slate-700 text-slate-400'
                                                         }`}>
                                                         +{m?.growth?.studentsLast30Days || 0}
                                                     </span>

@@ -7,11 +7,11 @@ import PageTransition from '../components/PageTransition';
 
 // Feature Card Component
 const FeatureCard = ({ title, description, icon: Icon, color, actionLabel, onClick }) => (
-    <div 
+    <div
         onClick={onClick}
-        className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/80 transition-all group cursor-pointer"
+        className="bg-slate-800/50 p-4 sm:p-6 rounded-2xl border border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/80 transition-all group cursor-pointer"
     >
-        <div className={`p-3 rounded-lg w-fit mb-4 ${color} bg-opacity-10`}>
+        <div className={`p-2.5 sm:p-3 rounded-lg w-fit mb-4 ${color} bg-opacity-10`}>
             <Icon size={24} className={color.replace('bg-', 'text-')} />
         </div>
         <h3 className="text-xl font-bold text-slate-100 mb-2">{title}</h3>
@@ -64,7 +64,7 @@ const TeacherDashboard = () => {
                     variants={container}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6"
                 >
                     <motion.div variants={item}>
                         <FeatureCard
@@ -121,7 +121,7 @@ const TeacherDashboard = () => {
                         />
                     </motion.div>
 
-                     <motion.div variants={item}>
+                    <motion.div variants={item}>
                         <FeatureCard
                             title="Question Paper"
                             description="Create and generate question papers using AI."

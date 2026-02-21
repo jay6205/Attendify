@@ -166,13 +166,13 @@ const AdminManagementPage = () => {
                 <div className="overflow-x-auto w-full pb-2">
                     <table className="w-full text-left border-collapse min-w-[500px]">
                         <thead>
-                            <tr className="bg-slate-900/50 text-slate-400 text-xs sm:text-sm">
+                            <tr className="bg-slate-900/50 text-slate-400 text-xs sm:text-base">
                                 <th className="p-3 sm:p-4 font-medium">Name</th>
                                 <th className="p-3 sm:p-4 font-medium">Email</th>
                                 <th className="hidden sm:table-cell p-3 sm:p-4 font-medium">Organization</th>
                                 <th className="p-3 sm:p-4 font-medium">Status</th>
                                 <th className="hidden lg:table-cell p-3 sm:p-4 font-medium">Role</th>
-                                <th className="p-3 sm:p-4 font-medium text-right">Actions</th>
+                                <th className="p-3 sm:p-4 sm:pr-8 font-medium text-right sm:text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-700">
@@ -204,15 +204,15 @@ const AdminManagementPage = () => {
                                         </td>
                                         <td className="p-3 sm:p-4">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${admin.isActive
-                                                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                                    : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                                : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                                                 }`}>
                                                 {admin.isActive ? 'Active' : 'Disabled'}
                                             </span>
                                         </td>
                                         <td className="hidden lg:table-cell p-3 sm:p-4 text-slate-400 text-sm capitalize">{admin.role}</td>
-                                        <td className="p-3 sm:p-4 text-right">
-                                            <div className="flex justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <td className="p-3 sm:p-4 sm:pr-8">
+                                            <div className="flex justify-end sm:justify-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => handleResetPassword(admin._id)}
                                                     className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-slate-700 rounded-lg transition-colors"
@@ -223,8 +223,8 @@ const AdminManagementPage = () => {
                                                 <button
                                                     onClick={() => handleToggleStatus(admin._id, admin.isActive)}
                                                     className={`p-2 rounded-lg transition-colors ${admin.isActive
-                                                            ? 'text-slate-400 hover:text-rose-400 hover:bg-rose-500/10'
-                                                            : 'text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10'
+                                                        ? 'text-slate-400 hover:text-rose-400 hover:bg-rose-500/10'
+                                                        : 'text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10'
                                                         }`}
                                                     title={admin.isActive ? "Disable" : "Enable"}
                                                 >
