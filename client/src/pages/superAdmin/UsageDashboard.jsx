@@ -6,14 +6,14 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v2';
 // ── Stat Card ──
 const StatCard = ({ icon: Icon, label, value, color, sub }) => (
     <div className="bg-slate-800 p-5 rounded-xl border border-slate-700">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-2">
             <div>
-                <p className="text-slate-400 text-sm font-medium mb-1">{label}</p>
-                <h3 className="text-2xl font-bold text-white">{value}</h3>
+                <p className="text-slate-400 text-xs sm:text-sm font-medium mb-1">{label}</p>
+                <h3 className="text-xl sm:text-2xl font-bold text-white">{value}</h3>
                 {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
             </div>
-            <div className={`p-3 rounded-lg ${color}`}>
-                <Icon size={22} className="text-white" />
+            <div className={`p-2 sm:p-3 rounded-lg ${color}`}>
+                <Icon size={20} className="text-white sm:w-[22px] sm:h-[22px]" />
             </div>
         </div>
     </div>
@@ -116,8 +116,10 @@ const UsageDashboard = () => {
             )}
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <StatCard icon={Building2} label="Organizations" value={totals.orgs} color="bg-indigo-500" />
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+                <div className="col-span-2 sm:col-span-1">
+                    <StatCard icon={Building2} label="Organizations" value={totals.orgs} color="bg-indigo-500" />
+                </div>
                 <StatCard icon={Users} label="Total Users" value={totals.users} color="bg-purple-500" />
                 <StatCard icon={Users} label="Students" value={totals.students} color="bg-blue-500" />
                 <StatCard icon={BookOpen} label="Courses" value={totals.courses} color="bg-cyan-500" />
@@ -136,17 +138,17 @@ const UsageDashboard = () => {
                         </h2>
                     </div>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
+                        <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[600px]">
                             <thead>
                                 <tr className="bg-slate-900/50 text-slate-400">
-                                    <th className="p-3 font-medium">Organization</th>
-                                    <th className="p-3 font-medium text-center">Admins</th>
-                                    <th className="p-3 font-medium text-center">Teachers</th>
-                                    <th className="p-3 font-medium text-center">Students</th>
-                                    <th className="p-3 font-medium text-center">Courses</th>
-                                    <th className="p-3 font-medium text-center">Assessments</th>
-                                    <th className="p-3 font-medium text-center">30d Growth</th>
-                                    <th className="p-3 font-medium">Last Activity</th>
+                                    <th className="p-2 sm:p-3 font-medium">Organization</th>
+                                    <th className="p-2 sm:p-3 font-medium text-center hidden sm:table-cell">Admins</th>
+                                    <th className="p-2 sm:p-3 font-medium text-center hidden sm:table-cell">Teachers</th>
+                                    <th className="p-2 sm:p-3 font-medium text-center">Students</th>
+                                    <th className="p-2 sm:p-3 font-medium text-center hidden md:table-cell">Courses</th>
+                                    <th className="p-2 sm:p-3 font-medium text-center hidden md:table-cell">Assessments</th>
+                                    <th className="p-2 sm:p-3 font-medium text-center">30d Growth</th>
+                                    <th className="p-2 sm:p-3 font-medium hidden sm:table-cell">Last Activity</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-700">
@@ -162,11 +164,11 @@ const UsageDashboard = () => {
 
                                         return (
                                             <tr key={m?.organizationId} className="hover:bg-slate-750 transition-colors">
-                                                <td className="p-3">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-white font-medium">{m?.organizationName}</span>
+                                                <td className="p-2 sm:p-3 whitespace-nowrap">
+                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                                        <span className="text-white font-medium truncate max-w-[120px] sm:max-w-none">{m?.organizationName}</span>
                                                         {!m?.isActive && (
-                                                            <span className="text-xs bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded-full border border-rose-500/20">
+                                                            <span className="text-[10px] sm:text-xs bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded-full border border-rose-500/20 w-max">
                                                                 Inactive
                                                             </span>
                                                         )}
@@ -175,21 +177,20 @@ const UsageDashboard = () => {
                                                         <span className="text-xs text-slate-500">{m?.organizationCode}</span>
                                                     )}
                                                 </td>
-                                                <td className="p-3 text-center text-slate-300">{m?.users?.admins || 0}</td>
-                                                <td className="p-3 text-center text-slate-300">{m?.users?.teachers || 0}</td>
-                                                <td className="p-3 text-center text-slate-300">{m?.users?.students || 0}</td>
-                                                <td className="p-3 text-center text-slate-300">{m?.academic?.courses || 0}</td>
-                                                <td className="p-3 text-center text-slate-300">{m?.academic?.assessments || 0}</td>
-                                                <td className="p-3 text-center">
-                                                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                                                        (m?.growth?.studentsLast30Days || 0) > 0
+                                                <td className="p-2 sm:p-3 text-center text-slate-300 hidden sm:table-cell">{m?.users?.admins || 0}</td>
+                                                <td className="p-2 sm:p-3 text-center text-slate-300 hidden sm:table-cell">{m?.users?.teachers || 0}</td>
+                                                <td className="p-2 sm:p-3 text-center text-slate-300">{m?.users?.students || 0}</td>
+                                                <td className="p-2 sm:p-3 text-center text-slate-300 hidden md:table-cell">{m?.academic?.courses || 0}</td>
+                                                <td className="p-2 sm:p-3 text-center text-slate-300 hidden md:table-cell">{m?.academic?.assessments || 0}</td>
+                                                <td className="p-2 sm:p-3 text-center">
+                                                    <span className={`text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full ${(m?.growth?.studentsLast30Days || 0) > 0
                                                             ? 'bg-emerald-500/10 text-emerald-400'
                                                             : 'bg-slate-700 text-slate-400'
-                                                    }`}>
-                                                        +{m?.growth?.studentsLast30Days || 0} students
+                                                        }`}>
+                                                        +{m?.growth?.studentsLast30Days || 0}
                                                     </span>
                                                 </td>
-                                                <td className="p-3 text-slate-400 text-xs">{timeAgo(latestActivity)}</td>
+                                                <td className="p-2 sm:p-3 text-slate-400 text-xs hidden sm:table-cell whitespace-nowrap">{timeAgo(latestActivity)}</td>
                                             </tr>
                                         );
                                     })

@@ -42,7 +42,7 @@ export const registerUser = async (req, res) => {
 
         // Find Organization by Code
         const organization = await Organization.findOne({ code: organizationCode.toUpperCase() });
-        
+
         if (!organization) {
             return res.status(400).json({ message: 'Invalid Organization Code' });
         }
@@ -99,7 +99,7 @@ export const loginUser = async (req, res) => {
                 token: generateToken('env-super-admin-id-001', 'super_admin'),
             });
         }
-        return res.status(400).json({ message: 'Invalid super admin credentials' });
+        return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // 2. Check for Database User

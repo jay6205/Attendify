@@ -19,7 +19,7 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
 const SuperAdminDashboard = () => {
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-white">Super Admin Dashboard</h1>
                     <p className="text-slate-400">System Overview and Master Controls</p>
@@ -30,64 +30,64 @@ const SuperAdminDashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                 {/* Quick Links Card */}
-                 <Link to="/super-admin/admins">
-                    <StatCard 
-                        icon={Shield} 
-                        label="System Admins" 
-                        value="Manage" 
-                        color="bg-emerald-500 text-emerald-500" 
+                {/* Quick Links Card */}
+                <Link to="/super-admin/admins">
+                    <StatCard
+                        icon={Shield}
+                        label="System Admins"
+                        value="Manage"
+                        color="bg-emerald-500 text-emerald-500"
                     />
                 </Link>
-                 <Link to="/super-admin/organizations">
-                    <StatCard 
-                        icon={Building2} 
-                        label="Organizations" 
-                        value="Manage" 
-                        color="bg-indigo-500 text-indigo-500" 
+                <Link to="/super-admin/organizations">
+                    <StatCard
+                        icon={Building2}
+                        label="Organizations"
+                        value="Manage"
+                        color="bg-indigo-500 text-indigo-500"
                     />
                 </Link>
-                <StatCard 
-                    icon={Server} 
-                    label="System Status" 
-                    value="Healthy" 
-                    color="bg-blue-500 text-blue-500" 
+                <StatCard
+                    icon={Server}
+                    label="System Status"
+                    value="Healthy"
+                    color="bg-blue-500 text-blue-500"
                 />
-                <StatCard 
-                    icon={Users} 
-                    label="Total Users" 
-                    value="--" 
-                    color="bg-purple-500 text-purple-500" 
+                <StatCard
+                    icon={Users}
+                    label="Total Users"
+                    value="--"
+                    color="bg-purple-500 text-purple-500"
                 />
-                <StatCard 
-                    icon={Activity} 
-                    label="Active Sessions" 
-                    value="--" 
-                    color="bg-orange-500 text-orange-500" 
+                <StatCard
+                    icon={Activity}
+                    label="Active Sessions"
+                    value="--"
+                    color="bg-orange-500 text-orange-500"
                 />
             </div>
 
             {/* Recent Activity or Warnings could go here */}
-            <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
+            <div className="bg-slate-800 rounded-xl border border-slate-700 p-4 sm:p-6">
                 <h2 className="text-lg font-bold text-white mb-4">Critical Actions</h2>
-                <div className="flex gap-4">
-                    <Link 
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
+                    <Link
                         to="/super-admin/admins"
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium"
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium text-center text-sm sm:text-base w-full sm:w-auto"
                     >
                         Manage Administrators
                     </Link>
-                    <Link 
+                    <Link
                         to="/super-admin/organizations"
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium"
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium text-center text-sm sm:text-base w-full sm:w-auto"
                     >
                         Manage Organizations
                     </Link>
                     {/* Placeholder buttons for future features */}
-                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-medium cursor-not-allowed opacity-50">
+                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-medium cursor-not-allowed opacity-50 text-center text-sm sm:text-base w-full sm:w-auto">
                         System Logs
                     </button>
-                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-medium cursor-not-allowed opacity-50">
+                    <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors font-medium cursor-not-allowed opacity-50 text-center text-sm sm:text-base w-full sm:w-auto">
                         Database Maintenance
                     </button>
                 </div>

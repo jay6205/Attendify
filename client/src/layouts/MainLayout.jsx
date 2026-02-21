@@ -13,12 +13,12 @@ const MainLayout = ({ children }) => {
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-16 md:ml-64 transition-all duration-300">
+      <div className="flex-1 ml-[4.5rem] md:ml-64 transition-all duration-300 w-full overflow-x-hidden">
         {/* Top Bar with Alert Bell */}
-        <div className="flex items-center justify-end px-8 pt-4">
+        <div className="flex items-center justify-end px-3 md:px-8 pt-4">
           <AlertBell />
         </div>
-        <div className="px-8 pb-8 max-w-7xl mx-auto">
+        <div className="px-3 md:px-8 pb-8 max-w-7xl mx-auto w-full">
           {children}
         </div>
       </div>
