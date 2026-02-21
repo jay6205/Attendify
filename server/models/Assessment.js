@@ -50,4 +50,7 @@ const assessmentSchema = new mongoose.Schema({
 // Prevent duplicate assessment titles within the same course
 assessmentSchema.index({ course: 1, title: 1 }, { unique: true });
 
+// Performance Indexes
+assessmentSchema.index({ organization: 1, course: 1 });
+
 export default mongoose.model('Assessment', assessmentSchema);

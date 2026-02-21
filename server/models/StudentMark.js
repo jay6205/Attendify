@@ -41,4 +41,7 @@ studentMarkSchema.index({ assessment: 1, student: 1 }, { unique: true });
 // Optimize queries for student's marks in a specific course
 studentMarkSchema.index({ student: 1, course: 1 });
 
+// Performance & Multi-tenant Indexes
+studentMarkSchema.index({ organization: 1, assessment: 1 });
+
 export default mongoose.model('StudentMark', studentMarkSchema);

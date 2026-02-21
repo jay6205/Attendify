@@ -39,8 +39,17 @@ const courseSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     }
 });
+
+// Performance Indexes
+courseSchema.index({ organization: 1 });
+courseSchema.index({ organization: 1, teacher: 1 });
+courseSchema.index({ organization: 1, semester: 1 });
 
 // Compound index to ensure uniqueness of course code within a semester if needed
 // courseSchema.index({ code: 1, semester: 1 }, { unique: true });

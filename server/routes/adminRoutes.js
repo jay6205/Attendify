@@ -6,7 +6,9 @@ import {
     updateSemester,
     createCourse,
     enrollStudent,
-    getTeachers
+    getTeachers,
+    deleteTeacher,
+    deleteCourse
 } from '../controllers/adminController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -18,9 +20,11 @@ router.use(authorize('admin')); // All routes require admin role
 
 router.get('/teachers', getTeachers);
 router.post('/teachers', createTeacher);
+router.delete('/teachers/:id', deleteTeacher);
 router.post('/semesters', createSemester);
 router.put('/semesters/:id', updateSemester);
 router.post('/courses', createCourse);
+router.delete('/courses/:id', deleteCourse);
 router.post('/enroll', enrollStudent);
 
 export default router;

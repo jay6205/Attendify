@@ -243,3 +243,55 @@ export const getTeachers = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+// @desc    Soft Delete a Teacher
+// @route   DELETE /api/v2/admin/teachers/:id
+// @access  Private/Admin
+export const deleteTeacher = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied: Admins only' });
+        }
+
+        const teacher = await User.findOneAndUpdate(
+            { _id: req.params.id, role: 'teacher', organization: req.user.organization },
+            { isActive: false },
+            { new: true }
+        );
+
+        if (!teacher) {
+            return res.status(404).json({ message: 'Teacher not found or unauthorized' });
+        }
+
+        res.json({ message: 'Teacher deactivated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Soft Delete a Course
+// @route   DELETE /api/v2/admin/courses/:id
+// @access  Private/Admin
+export const deleteCourse = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied: Admins only' });
+        }
+
+        const course = await Course.findOneAndUpdate(
+            { _id: req.params.id, organization: req.user.organization },
+            { isActive: false },
+            { new: true }
+        );
+
+        if (!course) {
+            return res.status(404).json({ message: 'Course not found or unauthorized' });
+        }
+
+        res.json({ message: 'Course deactivated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};

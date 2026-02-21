@@ -121,6 +121,10 @@ userSchema.pre('save', function (next) {
 // Index for efficient parent lookup by child ID
 userSchema.index({ linkedChildren: 1 });
 
+// Performance & Multi-tenant Indexes
+userSchema.index({ organization: 1, role: 1 });
+userSchema.index({ organization: 1, email: 1 });
+
 // Keep phoneRequired in sync with role on atomic updates
 function syncPhoneRequiredOnUpdate() {
     const update = this.getUpdate();

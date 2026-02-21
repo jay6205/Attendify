@@ -170,12 +170,14 @@ Attendify/
 | `GOOGLE_API_KEY` | Gemini API Key for AI/OCR | Yes |
 | `PORT` | Server Port (Default: 5000) | No |
 
-## Security Features
+## Security and Data Safety
 
 - **JWT Authentication**: Stateless, secure token-based auth.
 - **Password Hashing**: Bcryptjs used for password encryption.
 - **Protected Routes**: Middleware ensures private data access.
 - **Input Validation**: Backend validation for all critical inputs.
+- **Data Safety (Backups)**: It is highly recommended to set up scheduled MongoDB database dumps (e.g., using a CRON job with `mongodump`) in production environments.
+- **Data Safety (Soft Deletes)**: The admin and course models (database entities) utilize Soft-Deletes (`isActive` flag) to prevent accidental data loss.
 
 ## Contributing
 

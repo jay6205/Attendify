@@ -1,6 +1,7 @@
 import Alert from '../models/Alert.js';
 import User from '../models/User.js';
 import { sendTelegramMessage, buildTelegramMessage } from './telegram.service.js';
+import logger from '../utils/logger.js';
 
 // ─── Telegram Dispatch (fire-and-forget) ───────────────────────────────────────
 
@@ -18,7 +19,7 @@ const dispatchTelegramForUser = (userId, type, title, message, metadata) => {
                 await sendTelegramMessage(user.telegramChatId, text);
             }
         } catch (err) {
-            console.error(`[AlertService] Telegram dispatch failed for user ${userId}:`, err.message);
+            logger.error(`[AlertService] Telegram dispatch failed for user ${userId}: ${err.message}`);
         }
     })();
 };
@@ -45,7 +46,7 @@ const dispatchTelegramForBulk = (userIds, type, title, message, metadata) => {
                 users.map(u => sendTelegramMessage(u.telegramChatId, text))
             );
         } catch (err) {
-            console.error('[AlertService] Bulk Telegram dispatch failed:', err.message);
+            logger.error(`[AlertService] Bulk Telegram dispatch failed: ${err.message}`);
         }
     })();
 };
@@ -70,7 +71,7 @@ export const createAlert = async (userId, orgId, type, title, message, metadata 
         // Telegram delivery — async, non-blocking
         dispatchTelegramForUser(userId, type, title, message, metadata);
     } catch (error) {
-        console.error('[AlertService] Failed to create alert:', error.message);
+        logger.error(`[AlertService] Failed to create alert: ${error.message}`);
     }
 };
 
@@ -102,10 +103,10 @@ export const createBulkAlert = async (userIds, orgId, type, title, message, meta
             const dupCount = writeErrors.filter(e => e.code === 11000).length;
             const otherErrors = writeErrors.filter(e => e.code !== 11000);
             if (otherErrors.length > 0) {
-                console.error(`[AlertService] Bulk alert partial failure: ${otherErrors.length} non-duplicate errors`, otherErrors);
+                logger.error(`[AlertService] Bulk alert partial failure: ${otherErrors.length} non-duplicate errors`, { otherErrors });
             }
             if (dupCount > 0) {
-                console.warn(`[AlertService] Bulk alert: ${dupCount} duplicate(s) skipped`);
+                logger.warn(`[AlertService] Bulk alert: ${dupCount} duplicate(s) skipped`);
             }
             // Only dispatch Telegram for successfully inserted users
             const failedIndices = new Set(writeErrors.map(e => e.index));
@@ -114,7 +115,7 @@ export const createBulkAlert = async (userIds, orgId, type, title, message, meta
                 dispatchTelegramForBulk(successUserIds, type, title, message, metadata);
             }
         } else {
-            console.error('[AlertService] Failed to create bulk alerts:', error.message);
+            logger.error(`[AlertService] Failed to create bulk alerts: ${error.message}`);
         }
     }
 };
