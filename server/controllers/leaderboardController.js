@@ -30,9 +30,27 @@ export const getAssessmentLeaderboard = async (req, res) => {
 
         // Verify assessment exists
         const assessment = await Assessment.findById(assessmentId)
-            .populate('course', 'name code');
+            .populate('course', 'name code organization teacher students'); // Added fields for RBAC
         if (!assessment) {
             return res.status(404).json({ message: 'Assessment not found' });
+        }
+
+        const role = req.user.role;
+        const course = assessment.course;
+
+        // RBAC validation
+        if (role === 'student') {
+            if (!course.students.some(id => id.toString() === req.user._id.toString())) {
+                return res.status(403).json({ message: 'Not enrolled in this course' });
+            }
+        } else if (role === 'teacher') {
+            if (course.teacher.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: 'Not authorized for this course' });
+            }
+        } else if (role === 'admin') {
+            if (course.organization.toString() !== req.user.organization.toString()) {
+                return res.status(403).json({ message: 'Not authorized for this organization' });
+            }
         }
 
         // Fetch all marks sorted descending
@@ -94,13 +112,16 @@ export const getAssessmentLeaderboard = async (req, res) => {
         });
 
         // Build response
-        const role = req.user.role;
         const responseData = {
             assessment: {
                 _id: assessment._id,
                 title: assessment.title,
                 maxMarks: assessment.maxMarks,
-                course: assessment.course
+                course: {
+                    _id: assessment.course._id,
+                    name: assessment.course.name,
+                    code: assessment.course.code
+                }
             }
         };
 

@@ -163,9 +163,12 @@ export const getAttendance = async (req, res) => {
             query.student = req.user._id;
 
         } else {
-            // Admins? 
+            // Admins
             if (req.user.role !== 'admin') {
                  return res.status(403).json({ message: 'Access denied' });
+            }
+            if (course.organization.toString() !== req.user.organization.toString()) {
+                 return res.status(403).json({ message: 'Not authorized for this organization' });
             }
         }
 

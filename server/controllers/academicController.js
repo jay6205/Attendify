@@ -6,7 +6,10 @@ import Course from '../models/Course.js';
 // @access  Public/Authenticated
 export const getCourseById = async (req, res) => {
     try {
-        const course = await Course.findById(req.params.id)
+        const course = await Course.findOne({
+            _id: req.params.id,
+            organization: req.user.organization
+        })
             .populate('teacher', 'name email details')
             .populate('semester', 'name status startDate endDate')
             .populate('students', 'name email details.studentId'); // Essential for attendance marking
@@ -27,7 +30,9 @@ export const getCourseById = async (req, res) => {
 // @access  Public/Authenticated
 export const getAllSemesters = async (req, res) => {
     try {
-        const semesters = await Semester.find().sort({ startDate: -1 });
+        const semesters = await Semester.find({
+            organization: req.user.organization
+        }).sort({ startDate: -1 });
         res.json(semesters);
     } catch (error) {
         console.error(error);
@@ -40,7 +45,7 @@ export const getAllSemesters = async (req, res) => {
 // @access  Public/Authenticated
 export const getAllCourses = async (req, res) => {
     try {
-        const query = {};
+        const query = { organization: req.user.organization };
         if (req.query.semesterId) {
             query.semester = req.query.semesterId;
         }

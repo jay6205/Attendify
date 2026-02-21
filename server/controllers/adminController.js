@@ -32,6 +32,7 @@ export const createTeacher = async (req, res) => {
             email,
             passwordHash: hashedPassword,
             role: 'teacher',
+            organization: req.user.organization, // FIX: Multi-tenant orphaned data prevention
             details: {
                 department,
                 qualification
@@ -43,6 +44,7 @@ export const createTeacher = async (req, res) => {
             name: teacher.name,
             email: teacher.email,
             role: teacher.role,
+            organization: teacher.organization,
             details: teacher.details
         });
 
@@ -68,6 +70,7 @@ export const createSemester = async (req, res) => {
         }
 
         const semester = await Semester.create({
+            organization: req.user.organization, // FIX: Tenant scope
             name,
             startDate,
             endDate,
@@ -98,14 +101,14 @@ export const updateSemester = async (req, res) => {
             return res.status(400).json({ message: 'Invalid status' });
         }
 
-        const semester = await Semester.findByIdAndUpdate(
-            req.params.id,
+        const semester = await Semester.findOneAndUpdate(
+            { _id: req.params.id, organization: req.user.organization }, // FIX: Verify org ownership
             req.body,
             { new: true, runValidators: true }
         );
 
         if (!semester) {
-            return res.status(404).json({ message: 'Semester not found' });
+            return res.status(404).json({ message: 'Semester not found or access denied' });
         }
 
         res.json(semester);
@@ -136,9 +139,9 @@ export const createCourse = async (req, res) => {
             return res.status(400).json({ message: 'Invalid teacher ID' });
         }
 
-        const semester = await Semester.findById(semesterId);
+        const semester = await Semester.findOne({ _id: semesterId, organization: req.user.organization }); // FIX: Tenant scoped
         if (!semester) {
-            return res.status(400).json({ message: 'Invalid semester ID' });
+            return res.status(400).json({ message: 'Invalid semester ID or access denied' });
         }
         if (!req.user.organization) {
             return res.status(400).json({ message: 'Admin organization not configured' });
@@ -177,17 +180,25 @@ export const enrollStudent = async (req, res) => {
         }
 
         // Changed from ID lookup to Email lookup for better UX
-        const student = await User.findOne({ email: studentEmail.toLowerCase().trim(), role: 'student' });
-        
+        const student = await User.findOne({
+            email: studentEmail.toLowerCase().trim(),
+            role: 'student',
+            organization: req.user.organization // FIX: IDOR/Tenant Leak
+        });
+
         if (!student) {
-            return res.status(404).json({ message: 'Student not found with this email' });
+            return res.status(404).json({ message: 'Student not found in your organization with this email' });
         }
 
         const studentId = student._id;
 
-        const course = await Course.findById(courseId);
+        const course = await Course.findOne({
+            _id: courseId,
+            organization: req.user.organization // FIX: IDOR/Tenant Leak
+        });
+
         if (!course) {
-            return res.status(404).json({ message: 'Course not found' });
+            return res.status(404).json({ message: 'Course not found in your organization' });
         }
 
         // Check if now enrolled
@@ -215,7 +226,10 @@ export const getTeachers = async (req, res) => {
             return res.status(403).json({ message: 'Access denied: Admins only' });
         }
 
-        const teachers = await User.find({ role: 'teacher' }).select('-passwordHash');
+        const teachers = await User.find({
+            role: 'teacher',
+            organization: req.user.organization // FIX: Tenant scoped query
+        }).select('-passwordHash');
         res.json(teachers);
 
     } catch (error) {

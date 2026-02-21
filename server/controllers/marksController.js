@@ -325,7 +325,15 @@ export const getAssessmentsByCourse = async (req, res) => {
             if (!course) {
                 return res.status(403).json({ message: 'Not authorized for this course' });
             }
-        } else if (req.user.role !== 'admin') {
+        } else if (req.user.role === 'admin') {
+            const course = await Course.findOne({
+                _id: courseId,
+                organization: req.user.organization
+            });
+            if (!course) {
+                return res.status(403).json({ message: 'Not authorized for this course' });
+            }
+        } else {
             return res.status(403).json({ message: 'Not authorized for this course' });
         }
 

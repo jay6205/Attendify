@@ -8,12 +8,13 @@ import {
     enrollStudent,
     getTeachers
 } from '../controllers/adminController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect, authorize } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 // Base: /api/v2/admin
-router.use(protect); // All routes require auth (Admin role check inside controller)
+router.use(protect); // All routes require auth
+router.use(authorize('admin')); // All routes require admin role
 
 router.get('/teachers', getTeachers);
 router.post('/teachers', createTeacher);

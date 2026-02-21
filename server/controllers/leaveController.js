@@ -81,8 +81,10 @@ export const getLeaveRequests = async (req, res) => {
             const courseIds = courses.map(c => c._id);
             query.course = { $in: courseIds };
         } else if (req.user.role === 'admin') {
-            // Admin sees all? Or maybe filter by params
-            // For now, let admin see all
+            // Admin only sees leave requests for courses within their organization
+            const courses = await Course.find({ organization: req.user.organization }).select('_id');
+            const courseIds = courses.map(c => c._id);
+            query.course = { $in: courseIds };
         } else {
              return res.status(403).json({ message: 'Access denied' });
         }
