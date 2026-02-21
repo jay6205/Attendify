@@ -61,11 +61,17 @@ async function getUpdates() {
         // Reset backoff on success
         retryDelay = 1000;
     } catch (error) {
-        // Ignore timeout errors, log others and back off
+        // Ignore timeout errors
         if (error.code !== 'ETIMEDOUT') {
-            console.error('[Bot] Poll error:', error.message);
+            // Handle 409 Conflict specifically (Another instance is polling)
+            if (error.response?.status === 409) {
+                console.error('[Bot] ⚠ 409 Conflict: Another instance of this bot is already running. Pausing polling for 30s to prevent spamming Telegram API.');
+                retryDelay = 30000; // Force max backoff
+            } else {
+                console.error('[Bot] Poll error:', error.message);
+                retryDelay = Math.min(retryDelay * 2, MAX_RETRY_DELAY);
+            }
             await sleep(retryDelay);
-            retryDelay = Math.min(retryDelay * 2, MAX_RETRY_DELAY);
         }
     }
 }
