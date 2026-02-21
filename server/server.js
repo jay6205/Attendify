@@ -65,10 +65,18 @@ const sanitizeBody = (req, res, next) => {
 app.use(sanitizeBody);
 app.use(cors({
     origin: (origin, callback) => {
-        const allowedOrigins = process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(origin => origin.trim()) : [];
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        // Strip trailing slashes from allowed origins
+        const allowedOrigins = process.env.CLIENT_URL 
+            ? process.env.CLIENT_URL.split(',').map(url => url.trim().replace(/\/$/, '')) 
+            : [];
+            
+        // Strip trailing slash from incoming origin
+        const incomingOrigin = origin ? origin.replace(/\/$/, '') : null;
+
+        if (!incomingOrigin || allowedOrigins.includes(incomingOrigin)) {
             callback(null, true);
         } else {
+            console.error(`[CORS Blocked] Origin missing from CLIENT_URL: ${origin}`);
             callback(new Error('Not allowed by CORS'));
         }
     },
