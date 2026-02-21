@@ -248,18 +248,22 @@ export const stopSession = async (req, res) => {
 export const getActiveSession = async (req, res) => {
     try {
         const { courseId } = req.params;
-
         // FIX: Verify student is actually enrolled before leaking session presence
         const course = await Course.findOne({
             _id: courseId,
-            organization: req.user.organization,
-            students: req.user._id
+            organization: req.user.organization
         });
 
         if (!course) {
-            return res.status(403).json({ message: 'Not enrolled in this course' });
+            return res.status(404).json({ message: 'Course not found' });
         }
 
+        const isTeacher = course.teacher.toString() === req.user._id.toString();
+        const isStudent = course.students.some(s => s.toString() === req.user._id.toString());
+
+        if (!isTeacher && !isStudent) {
+            return res.status(403).json({ message: 'Not authorized for this course' });
+        }
         const session = await AttendanceSession.findOne({
             course: courseId,
             isActive: true,
