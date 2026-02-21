@@ -34,6 +34,7 @@ export const createAssessment = async (req, res) => {
         const assessment = await Assessment.create({
             course: courseId,
             teacher: req.user._id,
+            organization: req.user.organization,
             title,
             maxMarks,
             examType,

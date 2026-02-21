@@ -67,11 +67,11 @@ questionPaperSchema.pre('save', function (next) {
   if (this.questions && this.questions.length > 0) {
     const sum = this.questions.reduce((acc, q) => acc + q.marks, 0);
     if (sum !== this.totalMarks) {
-      // We can either error out or auto-correct. 
-      // User requirements say "Validate", so likely we should error or at least rely on the controller to validate before saving.
-      // However, frontend might send mismatching data if we strictly enforce equality here.
-      // Let's keep it lenient for 'draft' states if we had them, but for now we'll assume consistency is enforced by controller.
-      // We won't block save here to allow for some flexibility in updates, but the controller should validate.
+      const epsilon = 0.001;
+      if (Math.abs(sum - this.totalMarks) > epsilon) {
+        const error = new Error(`Total marks (${this.totalMarks}) must equal sum of question marks (${sum})`);
+        return next(error);
+      }
     }
   }
   next();
