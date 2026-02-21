@@ -194,11 +194,3 @@ export const logoutUser = async (req, res) => {
     // For now, we just respond success, and the client deletes the token.
     res.status(200).json({ message: 'Logged out successfully' });
 };
-
-// @desc    Google Auth Callback
-// @route   GET /api/v1/auth/google/callback
-// @access  Public
-export const googleAuthCallback = (req, res) => {
-    const token = generateToken(req.user._id, req.user.role || 'student');
-    res.redirect(`${process.env.CLIENT_URL}/auth/success?token=${token}`);
-};

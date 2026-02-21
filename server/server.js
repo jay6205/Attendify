@@ -6,7 +6,6 @@ import mongoSanitize from 'express-mongo-sanitize';
 import sanitizeHtml from 'sanitize-html';
 import morgan from 'morgan';
 import connectDB from './config/db.js';
-import './config/passport.js'; // Passport config
 import { globalLimiter, authLimiter, chatLimiter } from './middleware/rateLimiter.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import logger from './utils/logger.js';
