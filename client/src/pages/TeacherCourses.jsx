@@ -101,10 +101,6 @@ const TeacherCourses = () => {
                                         <span>{course.students?.length || 0} Students Enrolled</span>
                                     </div>
                                 </div>
-
-                                <button className="w-full py-2 bg-slate-700 hover:bg-indigo-600 text-white rounded-lg transition-colors text-sm font-medium">
-                                    View Details
-                                </button>
                             </div>
                         ))}
                     </div>
