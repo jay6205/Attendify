@@ -22,13 +22,13 @@ const getOrCreateAchievement = async (condition, name, description, icon, xp) =>
 const awardAchievement = async (studentId, achievement) => {
     // Atomically find user, ensure achievement isn't already earned, add it, and increment XP.
     const updatedUser = await User.findOneAndUpdate(
-        { 
-            _id: studentId, 
-            'earnedAchievements.achievementId': { $ne: achievement._id } 
+        {
+            _id: studentId,
+            'details.earnedAchievements.achievementId': { $ne: achievement._id }
         },
-        { 
-            $addToSet: { earnedAchievements: { achievementId: achievement._id } },
-            $inc: { xp: achievement.xp }
+        {
+            $addToSet: { 'details.earnedAchievements': { achievementId: achievement._id } },
+            $inc: { 'details.xp': achievement.xp }
         },
         { new: true }
     );

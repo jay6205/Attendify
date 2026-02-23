@@ -13,10 +13,10 @@ export const getStudentAchievements = async (req, res) => {
         // Fetch user with specifically populated earned achievements
         const user = await User.findById(req.user._id)
             .populate({
-                path: 'earnedAchievements.achievementId',
+                path: 'details.earnedAchievements.achievementId',
                 select: 'name description icon condition xp'
             })
-            .select('xp earnedAchievements details.studentId name');
+            .select('details.xp details.earnedAchievements details.studentId name');
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -26,7 +26,7 @@ export const getStudentAchievements = async (req, res) => {
         const allAchievements = await Achievement.find({}).select('name description icon condition xp');
 
         // Filter out any achievements that may have been deleted
-        const validEarnedAchievements = user.earnedAchievements.filter(ea => ea.achievementId != null);
+        const validEarnedAchievements = (user.details?.earnedAchievements || []).filter(ea => ea.achievementId != null);
         const earnedIds = new Set(validEarnedAchievements.map(ea => ea.achievementId._id.toString()));
 
         // Map earned achievements beautifully
@@ -52,7 +52,7 @@ export const getStudentAchievements = async (req, res) => {
         res.status(200).json({
             student: {
                 name: user.name,
-                xp: user.xp || 0
+                xp: user.details?.xp || 0
             },
             earned,
             locked
