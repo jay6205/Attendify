@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, CheckSquare, FileText, BarChart, MessageSquare, Loader2 } from 'lucide-react';
+import { BookOpen, CheckSquare, FileText, BarChart, MessageSquare, Loader2, PieChart as PieChartIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import api from '../api/axios';
 import AuthContext from '../context/AuthContext';
 import PageTransition from '../components/PageTransition';
@@ -45,14 +45,16 @@ const TeacherDashboard = () => {
         fetchSummary();
     }, []);
 
-    // Format data for the chart
-    const chartData = summaryData.map(course => ({
-        name: course.courseCode || course.courseName.substring(0, 10),
-        fullCourseName: course.courseName,
-        Present: course.weeklyAttendance?.present || 0,
-        Absent: course.weeklyAttendance?.absent || 0,
-        Leave: course.weeklyAttendance?.leave || 0,
-    }));
+    // Format data for the pie chart
+    const totalPresent = summaryData.reduce((acc, curr) => acc + (curr.weeklyAttendance?.present || 0), 0);
+    const totalAbsent = summaryData.reduce((acc, curr) => acc + (curr.weeklyAttendance?.absent || 0), 0);
+    const totalLeave = summaryData.reduce((acc, curr) => acc + (curr.weeklyAttendance?.leave || 0), 0);
+
+    const pieData = [
+        { name: 'Present', value: totalPresent, fill: '#10b981' },
+        { name: 'Absent', value: totalAbsent, fill: '#ef4444' },
+        { name: 'Leave', value: totalLeave, fill: '#f59e0b' }
+    ].filter(d => d.value > 0);
 
     const container = {
         hidden: { opacity: 0 },
@@ -166,49 +168,40 @@ const TeacherDashboard = () => {
                     {/* Attendance Overview Chart */}
                     <div className="lg:col-span-2 bg-slate-800/30 rounded-2xl border border-slate-700/50 p-6 min-h-[300px] flex flex-col">
                         <h3 className="text-xl font-bold text-slate-100 mb-6 flex items-center gap-2">
-                            <BarChart className="text-indigo-400" size={24} />
-                            7-Day Attendance Overview
+                            <PieChartIcon className="text-indigo-400" size={24} />
+                            7-Day Overall Attendance
                         </h3>
                         {loading ? (
                             <div className="flex-1 flex items-center justify-center">
                                 <Loader2 size={32} className="animate-spin text-indigo-500" />
                             </div>
-                        ) : chartData.length > 0 ? (
+                        ) : pieData.length > 0 ? (
                             <div className="flex-1 min-h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <RechartsBarChart
-                                        data={chartData}
-                                        margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                                        <XAxis 
-                                            dataKey="name" 
-                                            stroke="#94a3b8" 
-                                            tick={{ fill: '#94a3b8' }} 
-                                            axisLine={{ stroke: '#475569' }}
-                                        />
-                                        <YAxis 
-                                            stroke="#94a3b8" 
-                                            tick={{ fill: '#94a3b8' }} 
-                                            axisLine={{ stroke: '#475569' }}
-                                            tickLine={{ stroke: '#475569' }}
-                                            allowDecimals={false}
-                                        />
+                                    <PieChart>
+                                        <Pie
+                                            data={pieData}
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            stroke="none"
+                                        >
+                                            {pieData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                            ))}
+                                        </Pie>
                                         <Tooltip
                                             contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: '0.5rem', color: '#f8fafc' }}
                                             itemStyle={{ color: '#e2e8f0' }}
-                                            cursor={{ fill: 'rgba(51, 65, 85, 0.4)' }}
                                         />
-                                        <Legend wrapperStyle={{ paddingTop: '10px' }} />
-                                        <Bar dataKey="Present" stackId="a" fill="#10b981" radius={[0, 0, 4, 4]} />
-                                        <Bar dataKey="Leave" stackId="a" fill="#f59e0b" />
-                                        <Bar dataKey="Absent" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                                    </RechartsBarChart>
+                                        <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                                    </PieChart>
                                 </ResponsiveContainer>
                             </div>
                         ) : (
                             <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
-                                <BarChart size={48} className="mx-auto mb-4 opacity-20" />
+                                <PieChartIcon size={48} className="mx-auto mb-4 opacity-20" />
                                 <p>No attendance data for the last 7 days.</p>
                             </div>
                         )}
