@@ -46,6 +46,10 @@ const feedbackFormSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    expirationDate: {
+        type: Date,
+        default: null
     }
 }, {
     timestamps: true

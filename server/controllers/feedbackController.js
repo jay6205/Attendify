@@ -55,7 +55,8 @@ export const createFeedbackForm = async (req, res) => {
             teacher: course.teacher,
             type,
             questions,
-            isActive: true
+            isActive: true,
+            expirationDate: req.body.expirationDate || null
         });
 
         res.status(201).json(form);
@@ -92,22 +93,32 @@ export const getActiveFeedback = async (req, res) => {
         const activeForms = await FeedbackForm.find({
             organization: req.organizationId,
             course: { $in: courseIds },
-            isActive: true
+            isActive: true,
+            $or: [
+                { expirationDate: null },
+                { expirationDate: { $gt: new Date() } }
+            ]
         })
             .populate('course', 'name code')
             .populate('teacher', 'name')
             .populate('assessment', 'title');
 
+        // Filter out forms that were created before the student's account was created
+        const studentCreatedAt = req.user.createdAt;
+        const visibleForms = activeForms.filter(form => {
+            return form.createdAt >= studentCreatedAt;
+        });
+
         // Find which forms this student has already submitted
         const submittedFormIds = await FeedbackResponse.find({
             student: studentId,
-            formId: { $in: activeForms.map(f => f._id) }
+            formId: { $in: visibleForms.map(f => f._id) }
         }).distinct('formId');
 
         const submittedSet = new Set(submittedFormIds.map(id => id.toString()));
 
         // Filter out already-submitted forms
-        const pendingForms = activeForms.filter(
+        const pendingForms = visibleForms.filter(
             form => !submittedSet.has(form._id.toString())
         );
 
@@ -130,11 +141,19 @@ export const submitFeedback = async (req, res) => {
         const form = await FeedbackForm.findOne({
             _id: formId,
             organization: req.organizationId,
-            isActive: true
+            isActive: true,
+            $or: [
+                { expirationDate: null },
+                { expirationDate: { $gt: new Date() } }
+            ]
         });
 
         if (!form) {
-            return res.status(404).json({ message: 'Feedback form not found or is no longer active' });
+            return res.status(404).json({ message: 'Feedback form not found, is no longer active, or has expired' });
+        }
+
+        if (form.createdAt < req.user.createdAt) {
+            return res.status(403).json({ message: 'You cannot submit feedback for a form created before your enrollment' });
         }
 
         // Validate answers array

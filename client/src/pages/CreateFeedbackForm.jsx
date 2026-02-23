@@ -30,6 +30,7 @@ const CreateFeedbackForm = () => {
     const [selectedCourse, setSelectedCourse] = useState('');
     const [feedbackType, setFeedbackType] = useState('POST_ASSESSMENT');
     const [selectedAssessment, setSelectedAssessment] = useState('');
+    const [expirationDate, setExpirationDate] = useState('');
     const [questions, setQuestions] = useState(POST_ASSESSMENT_DEFAULTS);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -150,13 +151,15 @@ const CreateFeedbackForm = () => {
                 courseId: selectedCourse,
                 assessmentId: feedbackType === 'POST_ASSESSMENT' ? selectedAssessment : undefined,
                 type: feedbackType,
-                questions
+                questions,
+                expirationDate: expirationDate ? new Date(expirationDate).toISOString() : null
             });
             setSuccess(true);
             setTimeout(() => setSuccess(false), 3000);
             // Reset
             setSelectedCourse('');
             setSelectedAssessment('');
+            setExpirationDate('');
             setQuestions(POST_ASSESSMENT_DEFAULTS);
             setFeedbackType('POST_ASSESSMENT');
         } catch (err) {
@@ -263,6 +266,23 @@ const CreateFeedbackForm = () => {
                             </div>
                         </div>
                     )}
+
+                    {/* Expiration Date Section */}
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-slate-300">
+                            Expiration Date <span className="text-slate-500 font-normal">(Optional)</span>
+                        </label>
+                        <input
+                            type="datetime-local"
+                            value={expirationDate}
+                            onChange={(e) => setExpirationDate(e.target.value)}
+                            min={new Date().toISOString().slice(0, 16)}
+                            className="w-full bg-slate-800/60 border border-slate-600/50 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                        />
+                        <p className="text-xs text-slate-500">
+                            If set, students will not be able to see or submit this feedback after this date.
+                        </p>
+                    </div>
 
                     {/* Questions */}
                     <div className="space-y-4">
