@@ -2,6 +2,7 @@ import Assessment from '../models/Assessment.js';
 import StudentMark from '../models/StudentMark.js';
 import Course from '../models/Course.js';
 import { createBulkAlert } from '../services/alert.service.js';
+import { evaluateAcademicAchievements } from '../services/achievement.service.js';
 
 // @desc    Create a new assessment
 // @route   POST /api/v2/marks/assessment/create
@@ -177,6 +178,11 @@ export const enterMarks = async (req, res) => {
                     { assessmentId: assessment._id, courseId: course._id, assessmentTitle: assessment.title }
                 ).catch(err => console.error(`[AlertTrigger] Failed marks alert for assessment=${assessment._id} course=${course._id}:`, err.message));
             }
+
+            // ACHIEVEMENT TRIGGER: evaluate for top score or perfect score (fire-and-forget)
+            evaluateAcademicAchievements(assessmentId).catch(err => 
+                console.error(`[AchievementTrigger] Failed academic eval for assessment=${assessmentId}:`, err.message)
+            );
         }
 
         res.json({

@@ -102,6 +102,7 @@ import userRoutes from './routes/userRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
 import telegramRoutes from './routes/telegramRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import achievementRoutes from './routes/achievementRoutes.js';
 
 // Mount routers
 app.use('/api/v2/auth', authLimiter, authRoutes); // Stricter rate limit for Auth
@@ -120,6 +121,7 @@ app.use('/api/v2/leaderboard', leaderboardRoutes);
 app.use('/api/v2/feedback', feedbackRoutes);
 app.use('/api/v2/users', userRoutes);
 app.use('/api/v2/alerts', alertRoutes);
+app.use('/api/v2/achievements', achievementRoutes);
 
 app.use('/api/v2/telegram', telegramRoutes);
 app.use('/api/v2/chat', chatLimiter, chatRoutes); // Stricter rate limit for chat

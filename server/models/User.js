@@ -34,6 +34,20 @@ const userSchema = new mongoose.Schema({
         studentId: { type: String, unique: true, sparse: true, trim: true },
         batch: { type: String }, // e.g. "2023-2027"
         currentSemester: { type: Number },
+        
+        // --- Gamification ---
+        xp: { type: Number, default: 0 },
+        earnedAchievements: [{
+            achievementId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Achievement',
+                required: true
+            },
+            earnedAt: {
+                type: Date,
+                default: Date.now
+            }
+        }],
     },
     // --- Telegram Integration ---
     telegramChatId: {

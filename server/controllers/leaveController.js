@@ -1,6 +1,7 @@
 import LeaveRequest from '../models/LeaveRequest.js';
 import Course from '../models/Course.js';
 import Attendance from '../models/Attendance.js';
+import { evaluateLeaveAchievements } from '../services/achievement.service.js';
 
 // @desc    Submit a leave request
 // @route   POST /api/v2/leaves
@@ -173,6 +174,11 @@ export const handleLeaveRequest = async (req, res) => {
                     { upsert: true, new: true }
                 );
             }));
+
+            // ACHIEVEMENT TRIGGER: notify if student achieves a milestone (fire-and-forget)
+            evaluateLeaveAchievements(leaveRequest.student).catch(err => 
+                console.error(`[AchievementTrigger] Failed leave eval for student=${leaveRequest.student}:`, err.message)
+            );
         }
 
         res.json(leaveRequest);

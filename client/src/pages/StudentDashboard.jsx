@@ -7,6 +7,7 @@ import PageTransition from '../components/PageTransition';
 import SkeletonCard from '../components/SkeletonCard';
 import StudentActiveSessionCard from '../components/StudentActiveSessionCard';
 import FeedbackBanner from '../components/feedback/FeedbackBanner';
+import AchievementShowcase from '../components/achievements/AchievementShowcase';
 import { LayoutDashboard, BookOpen, AlertCircle } from 'lucide-react';
 
 // Stat Card Component
@@ -196,6 +197,11 @@ const StudentDashboard = () => {
                                 color="text-rose-400"
                             />
                         </div>
+
+                        {/* Achievements Showcase (Gamification) */}
+                        {loginAs !== 'parent' && !loading && (
+                            <AchievementShowcase />
+                        )}
 
                         {/* Courses Grid */}
                         <section>

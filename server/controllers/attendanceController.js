@@ -3,6 +3,7 @@ import Course from '../models/Course.js';
 import Semester from '../models/Semester.js';
 import LeaveRequest from '../models/LeaveRequest.js';
 import { createAlert } from '../services/alert.service.js';
+import { evaluateAttendanceAchievements } from '../services/achievement.service.js';
 
 // @desc    Mark attendance for a student (Teacher only)
 // @route   POST /api/v2/attendance/mark
@@ -116,6 +117,13 @@ export const markAttendance = async (req, res) => {
                 `You were marked absent in ${course.name} (${course.code}) on ${dateStr}${timeSlot}.`,
                 { courseId, courseName: course.name, date: attendanceDate, startTime, endTime }
             ).catch(err => console.error(`[AlertTrigger] Failed absence alert for student=${studentId} course=${course.name} date=${dateStr}:`, err.message));
+        }
+
+        // ACHIEVEMENT TRIGGER: notify if student achieves a milestone (fire-and-forget)
+        if (status === 'Present'&& course.organization) {
+            evaluateAttendanceAchievements(studentId, course.organization).catch(err => 
+                console.error(`[AchievementTrigger] Failed attendance eval for student=${studentId}:`, err.message)
+            );
         }
 
     } catch (error) {
