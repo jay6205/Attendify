@@ -273,10 +273,71 @@ export const getWeeklySummary = async (req, res) => {
             }
         ]);
 
-        // 4. Construct Response
+        // 4. Identify At-Risk Students (Attendance <= 50% in the last 7 days)
+        const atRiskDataRaw = await Attendance.aggregate([
+            {
+                $match: {
+                    course: { $in: courseIds },
+                    date: { $gte: sevenDaysAgo }
+                }
+            },
+            {
+                $group: {
+                    _id: { course: '$course', student: '$student' },
+                    totalClasses: { $sum: 1 },
+                    presentClasses: { 
+                        $sum: { $cond: [{ $eq: ['$status', 'Present'] }, 1, 0] } 
+                    }
+                }
+            },
+            {
+                $project: {
+                    course: '$_id.course',
+                    student: '$_id.student',
+                    attendancePercentage: {
+                        $cond: [
+                            { $gt: ['$totalClasses', 0] },
+                            { $multiply: [{ $divide: ['$presentClasses', '$totalClasses'] }, 100] },
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                // Define "at-risk" as 60% or lower
+                $match: { attendancePercentage: { $lte: 60 } }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'student',
+                    foreignField: '_id',
+                    as: 'studentInfo'
+                }
+            },
+            {
+                $unwind: '$studentInfo'
+            },
+            {
+                $group: {
+                    _id: '$course',
+                    students: {
+                        $push: {
+                            studentId: '$student',
+                            name: '$studentInfo.name',
+                            email: '$studentInfo.email',
+                            attendancePercentage: { $round: ['$attendancePercentage', 1] }
+                        }
+                    }
+                }
+            }
+        ]);
+
+        // 5. Construct Response
         const response = courses.map(course => {
             const att = attendanceData.find(a => a._id.toString() === course._id.toString()) || { total: 0, present: 0, absent: 0, leave: 0 };
             const lvs = leavesData.find(l => l._id.toString() === course._id.toString()) || { total: 0, approved: 0, rejected: 0, pending: 0 };
+            const atRisk = atRiskDataRaw.find(ar => ar._id.toString() === course._id.toString())?.students || [];
 
             return {
                 courseId: course._id,
@@ -295,7 +356,7 @@ export const getWeeklySummary = async (req, res) => {
                     rejected: lvs.rejected,
                     pending: lvs.pending
                 },
-                atRiskStudents: [] // Placeholder for future logic
+                atRiskStudents: atRisk
             };
         });
 
