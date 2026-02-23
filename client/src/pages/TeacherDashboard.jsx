@@ -1,7 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, CheckSquare, FileText, BarChart, Plus, MessageSquare } from 'lucide-react';
+import { BookOpen, CheckSquare, FileText, BarChart, MessageSquare, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import api from '../api/axios';
 import AuthContext from '../context/AuthContext';
 import PageTransition from '../components/PageTransition';
 
@@ -25,6 +27,32 @@ const FeatureCard = ({ title, description, icon: Icon, color, actionLabel, onCli
 const TeacherDashboard = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    const [summaryData, setSummaryData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchSummary = async () => {
+            try {
+                const res = await api.get('/attendance/weekly-summary');
+                setSummaryData(res.data);
+            } catch (error) {
+                console.error("Failed to fetch summary data", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSummary();
+    }, []);
+
+    // Format data for the chart
+    const chartData = summaryData.map(course => ({
+        name: course.courseCode || course.courseName.substring(0, 10),
+        fullCourseName: course.courseName,
+        Present: course.weeklyAttendance?.present || 0,
+        Absent: course.weeklyAttendance?.absent || 0,
+        Leave: course.weeklyAttendance?.leave || 0,
+    }));
 
     const container = {
         hidden: { opacity: 0 },
@@ -133,20 +161,100 @@ const TeacherDashboard = () => {
                     </motion.div>
                 </motion.div>
 
-                {/* Recent Activity / Quick Stats Section Placeholder */}
+                {/* Recent Activity / Quick Stats Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 bg-slate-800/30 rounded-2xl border border-slate-700/50 p-6 min-h-[300px] flex items-center justify-center text-slate-500">
-                        <div className="text-center">
-                            <BarChart size={48} className="mx-auto mb-4 opacity-20" />
-                            <p>Attendance Overview Graph (Coming Soon)</p>
-                        </div>
+                    {/* Attendance Overview Chart */}
+                    <div className="lg:col-span-2 bg-slate-800/30 rounded-2xl border border-slate-700/50 p-6 min-h-[300px] flex flex-col">
+                        <h3 className="text-xl font-bold text-slate-100 mb-6 flex items-center gap-2">
+                            <BarChart className="text-indigo-400" size={24} />
+                            7-Day Attendance Overview
+                        </h3>
+                        {loading ? (
+                            <div className="flex-1 flex items-center justify-center">
+                                <Loader2 size={32} className="animate-spin text-indigo-500" />
+                            </div>
+                        ) : chartData.length > 0 ? (
+                            <div className="flex-1 min-h-[250px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <RechartsBarChart
+                                        data={chartData}
+                                        margin={{ top: 10, right: 30, left: 0, bottom: 5 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                                        <XAxis 
+                                            dataKey="name" 
+                                            stroke="#94a3b8" 
+                                            tick={{ fill: '#94a3b8' }} 
+                                            axisLine={{ stroke: '#475569' }}
+                                        />
+                                        <YAxis 
+                                            stroke="#94a3b8" 
+                                            tick={{ fill: '#94a3b8' }} 
+                                            axisLine={{ stroke: '#475569' }}
+                                            tickLine={{ stroke: '#475569' }}
+                                            allowDecimals={false}
+                                        />
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: '0.5rem', color: '#f8fafc' }}
+                                            itemStyle={{ color: '#e2e8f0' }}
+                                            cursor={{ fill: 'rgba(51, 65, 85, 0.4)' }}
+                                        />
+                                        <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                                        <Bar dataKey="Present" stackId="a" fill="#10b981" radius={[0, 0, 4, 4]} />
+                                        <Bar dataKey="Leave" stackId="a" fill="#f59e0b" />
+                                        <Bar dataKey="Absent" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                                    </RechartsBarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        ) : (
+                            <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
+                                <BarChart size={48} className="mx-auto mb-4 opacity-20" />
+                                <p>No attendance data for the last 7 days.</p>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="bg-slate-800/30 rounded-2xl border border-slate-700/50 p-6 min-h-[300px] flex items-center justify-center text-slate-500">
-                        <div className="text-center">
-                            <FileText size={48} className="mx-auto mb-4 opacity-20" />
-                            <p>Recent Actions (Coming Soon)</p>
-                        </div>
+                    {/* Class Summaries (Recent Actions) */}
+                    <div className="bg-slate-800/30 rounded-2xl border border-slate-700/50 p-6 flex flex-col max-h-[400px]">
+                        <h3 className="text-xl font-bold text-slate-100 mb-6 flex items-center gap-2">
+                            <BookOpen className="text-indigo-400" size={24} />
+                            Class Status
+                        </h3>
+                        {loading ? (
+                            <div className="flex-1 flex items-center justify-center">
+                                <Loader2 size={32} className="animate-spin text-indigo-500" />
+                            </div>
+                        ) : summaryData.length > 0 ? (
+                            <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                                {summaryData.map(course => (
+                                    <div key={course.courseId} className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+                                        <h4 className="font-bold text-slate-200 truncate" title={course.courseName}>{course.courseName}</h4>
+                                        <div className="mt-2 text-sm space-y-1">
+                                            <div className="flex justify-between items-center text-slate-400">
+                                                <span>Attendance Rate:</span>
+                                                <span className={`font-semibold ${
+                                                    course.weeklyAttendance.percentage >= 75 ? 'text-emerald-400' :
+                                                    course.weeklyAttendance.percentage >= 60 ? 'text-amber-400' : 'text-rose-400'
+                                                }`}>
+                                                    {course.weeklyAttendance.percentage}%
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-slate-400">
+                                                <span>Pending Leaves:</span>
+                                                <span className={course.weeklyLeaves.pending > 0 ? 'text-amber-400 font-semibold' : 'text-slate-500'}>
+                                                    {course.weeklyLeaves.pending}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex-1 flex flex-col items-center justify-center text-slate-500 mt-8">
+                                <FileText size={48} className="mx-auto mb-4 opacity-20" />
+                                <p className="text-center">No active courses found.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
