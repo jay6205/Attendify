@@ -12,6 +12,7 @@ const AdminDashboard = () => {
     const [teachers, setTeachers] = useState([]);
     const [semesters, setSemesters] = useState([]);
     const [courses, setCourses] = useState([]);
+    const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState({ type: '', text: '' });
 
@@ -38,10 +39,13 @@ const AdminDashboard = () => {
     const fetchCourses = async () => {
         try { const res = await api.get('/academic/courses'); setCourses(res.data); } catch (e) { console.error(e); }
     };
+    const fetchStudents = async () => {
+        try { const res = await api.get('/admin/students'); setStudents(res.data); } catch (e) { console.error(e); }
+    };
 
     useEffect(() => {
         if (activeTab === 'courses') { fetchTeachers(); fetchSemesters(); }
-        if (activeTab === 'enroll') { fetchCourses(); }
+        if (activeTab === 'enroll') { fetchCourses(); fetchStudents(); }
     }, [activeTab]);
 
 
@@ -205,8 +209,11 @@ const AdminDashboard = () => {
                         <form onSubmit={handleEnroll} className="space-y-4 sm:space-y-6">
                             <h2 className="text-lg sm:text-xl font-bold text-slate-100 mb-4 sm:mb-6 flex items-center gap-2"><Users size={20} className="text-indigo-400" /> Enroll Student</h2>
                             <div>
-                                <label className="text-slate-400 text-[13px] sm:text-sm mb-1 block">Student Email</label>
-                                <input required className="input-field text-sm sm:text-base" placeholder="student@example.com" value={enrollForm.studentEmail} onChange={e => setEnrollForm({ ...enrollForm, studentEmail: e.target.value })} type="email" />
+                                <label className="text-slate-400 text-[13px] sm:text-sm mb-1 block">Select Student</label>
+                                <select required className="input-field text-sm sm:text-base" value={enrollForm.studentEmail} onChange={e => setEnrollForm({ ...enrollForm, studentEmail: e.target.value })}>
+                                    <option value="">Select Student...</option>
+                                    {students.map(s => <option key={s._id} value={s.email}>{s.name} ({s.email})</option>)}
+                                </select>
                             </div>
                             <div>
                                 <label className="text-slate-400 text-[13px] sm:text-sm mb-1 block">Select Course</label>

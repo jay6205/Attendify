@@ -7,6 +7,7 @@ import {
     createCourse,
     enrollStudent,
     getTeachers,
+    getStudents,
     deleteTeacher,
     deleteCourse
 } from '../controllers/adminController.js';
@@ -19,6 +20,7 @@ router.use(protect); // All routes require auth
 router.use(authorize('admin')); // All routes require admin role
 
 router.get('/teachers', getTeachers);
+router.get('/students', getStudents);
 router.post('/teachers', createTeacher);
 router.delete('/teachers/:id', deleteTeacher);
 router.post('/semesters', createSemester);

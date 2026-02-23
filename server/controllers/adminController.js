@@ -244,6 +244,30 @@ export const getTeachers = async (req, res) => {
     }
 };
 
+// @desc    Get all Students
+// @route   GET /api/v2/admin/students
+// @access  Private/Admin
+export const getStudents = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied: Admins only' });
+        }
+
+        const students = await User.find({
+            role: 'student',
+            organization: req.user.organization
+        })
+        .select('name email _id')
+        .sort({ name: 1 });
+
+        res.json(students);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 // @desc    Soft Delete a Teacher
 // @route   DELETE /api/v2/admin/teachers/:id
 // @access  Private/Admin
