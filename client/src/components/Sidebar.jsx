@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { LayoutDashboard, Calendar, PieChart, Settings, LogOut, Bot, BookOpen, CheckSquare, FileText, BarChart, BarChart2, Award, TrendingUp, Shield, Building2, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Calendar, PieChart, Settings, LogOut, Bot, BookOpen, CheckSquare, FileText, BarChart, BarChart2, Award, TrendingUp, Shield, Building2, MessageSquare, Star } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
@@ -26,6 +26,7 @@ const Sidebar = () => {
     const menuItems = {
         student: [
             { icon: LayoutDashboard, label: "Dashboard", path: "/student" },
+            { icon: Star, label: "Achievements", path: "/student/achievements" },
             { icon: Award, label: "My Marks", path: "/student/marks" },
             { icon: TrendingUp, label: "Performance", path: "/student/performance" },
             { icon: FileText, label: "My Leaves", path: "/student/leaves" },
