@@ -118,9 +118,13 @@ export const loginUser = async (req, res) => {
             token: generateToken(user._id, user.role),
         };
 
-        // Parent phone capture: flag frontend to show phone modal
-        if (user.role === 'parent' && !user.phoneNumber) {
-            responseData.needsPhoneNumber = true;
+        // Parent phone capture: send the number if present, else flag frontend to show phone modal
+        if (user.role === 'parent') {
+            if (user.phoneNumber) {
+                responseData.phoneNumber = user.phoneNumber;
+            } else {
+                responseData.needsPhoneNumber = true;
+            }
         }
 
         res.json(responseData);
