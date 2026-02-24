@@ -86,6 +86,7 @@ app.use(cors({
 // Route files (V2)
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import adminPerformanceRoutes from './routes/adminPerformanceRoutes.js';
 import academicRoutes from './routes/academicRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
 import aiAttendanceRoutes from './routes/aiAttendanceRoutes.js';
@@ -110,6 +111,7 @@ app.use('/api/v2/super-admin', superAdminRoutes); // Super Admin Routes
 app.use('/api/v2/super-admin/organizations', organizationRoutes); // Organization Routes
 app.use('/api/v2/super-admin/metrics', superAdminMetricsRoutes); // Metrics Routes
 app.use('/api/v2/admin', adminRoutes);
+app.use('/api/v2/admin/performance', adminPerformanceRoutes);
 app.use('/api/v2/academic', academicRoutes);
 app.use('/api/v2/attendance', attendanceRoutes);
 app.use('/api/v2/attendance/ai', aiAttendanceRoutes); // New AI Attendance Route

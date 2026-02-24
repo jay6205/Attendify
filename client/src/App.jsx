@@ -11,6 +11,7 @@ import TeacherAttendance from './pages/TeacherAttendance';
 import TeacherLeaves from './pages/TeacherLeaves';
 import TeacherSummary from './pages/TeacherSummary';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminStudentPerformancePage from './pages/AdminStudentPerformancePage';
 import StudentLeaves from './pages/StudentLeaves';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -164,6 +165,11 @@ function App() {
             <Route path="/admin/feedback" element={
               <MainLayout>
                 <TeacherFeedbackSummary />
+              </MainLayout>
+            } />
+            <Route path="/admin/performance" element={
+              <MainLayout>
+                <AdminStudentPerformancePage />
               </MainLayout>
             } />
           </Route>

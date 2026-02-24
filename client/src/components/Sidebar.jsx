@@ -56,6 +56,7 @@ const Sidebar = () => {
         ],
         admin: [
             { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
+            { icon: BarChart2, label: "Performance", path: "/admin/performance" },
             { icon: Settings, label: "System", path: "/admin/system" },
             { icon: MessageSquare, label: "Create Feedback", path: "/admin/feedback/create" },
             { icon: MessageSquare, label: "Feedback Summary", path: "/admin/feedback" }
