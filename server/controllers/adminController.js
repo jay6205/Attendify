@@ -232,9 +232,15 @@ export const getTeachers = async (req, res) => {
             return res.status(403).json({ message: 'Access denied: Admins only' });
         }
 
+        if (!req.user.organization) {
+            return res.status(400).json({ message: 'Organization context required for admin' });
+        }
+
+        const orgId = req.user.organization._id || req.user.organization;
+
         const teachers = await User.find({
             role: 'teacher',
-            organization: req.user.organization // FIX: Tenant scoped query
+            organization: orgId // FIX: Tenant scoped query safely using strict ID
         }).select('-passwordHash');
         res.json(teachers);
 
@@ -253,11 +259,17 @@ export const getStudents = async (req, res) => {
             return res.status(403).json({ message: 'Access denied: Admins only' });
         }
 
+        if (!req.user.organization) {
+            return res.status(400).json({ message: 'Organization context required for admin' });
+        }
+
+        const orgId = req.user.organization._id || req.user.organization;
+
         const students = await User.find({
             role: 'student',
-            organization: req.user.organization
+            organization: orgId
         })
-        .select('name email _id')
+        .select('name email _id details')
         .sort({ name: 1 });
 
         res.json(students);
