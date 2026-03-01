@@ -28,6 +28,7 @@ export const startSession = async (req, res) => {
         const expiresAt = new Date(Date.now() + durationMinutes * 60000);
 
         const session = await AttendanceSession.create({
+            organization: course.organization,
             course: courseId,
             teacher: req.user._id,
             question,
