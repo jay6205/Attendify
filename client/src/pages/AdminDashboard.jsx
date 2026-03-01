@@ -196,20 +196,21 @@ const AdminDashboard = () => {
                                             const start = new Date(semester.startDate);
                                             const end = new Date(semester.endDate);
 
-                                            // Ensure end of day for end date comparison matching the backend fix
-                                            end.setHours(23, 59, 59, 999);
+                                            // Normalize to start of day in local time for consistent comparison
+                                            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                            const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+                                            const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
 
                                             let status = 'Active';
                                             let badgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
 
-                                            if (now < start) {
+                                            if (today < startDay) {
                                                 status = 'Upcoming';
                                                 badgeClass = 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
-                                            } else if (now > end) {
+                                            } else if (today > endDay) {
                                                 status = 'Completed';
                                                 badgeClass = 'bg-slate-500/10 text-slate-400 border-slate-500/20';
                                             }
-
                                             return (
                                                 <div key={semester._id} className="bg-slate-800/80 p-4 rounded-xl border border-slate-700/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
                                                     <div>
