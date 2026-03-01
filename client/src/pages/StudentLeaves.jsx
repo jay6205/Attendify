@@ -19,6 +19,10 @@ const StudentLeaves = () => {
         reason: ''
     });
     const [msg, setMsg] = useState({ type: '', text: '' });
+    
+    // Derived state for semester check
+    const selectedCourseData = courses.find(c => c._id === formData.courseId);
+    const isSemesterCompleted = selectedCourseData && selectedCourseData.semester && new Date() > new Date(selectedCourseData.semester.endDate);
 
     // Fetch Data
     useEffect(() => {
@@ -136,45 +140,59 @@ const StudentLeaves = () => {
                                     ))}
                                 </select>
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">From Date</label>
-                                    <input 
-                                        type="date" 
-                                        required
-                                        value={formData.startDate}
-                                        onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
-                                    />
+                            
+                            {formData.courseId && isSemesterCompleted && (
+                                <div className="p-5 rounded-2xl border bg-amber-500/10 border-amber-500/20 text-center">
+                                    <AlertCircle size={32} className="mx-auto text-amber-400 mb-3" />
+                                    <h3 className="text-lg font-bold text-slate-200 mb-1">Semester Completed</h3>
+                                    <p className="text-sm text-amber-400">
+                                        The semester for this course has officially ended. You can no longer apply for leave.
+                                    </p>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-2">To Date</label>
-                                    <input 
-                                        type="date" 
-                                        required
-                                        value={formData.endDate}
-                                        onChange={(e) => setFormData({...formData, endDate: e.target.value})}
-                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
-                                    />
-                                </div>
-                            </div>
+                            )}
 
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-2">Reason</label>
-                                <textarea 
-                                    required
-                                    rows="4"
-                                    value={formData.reason}
-                                    onChange={(e) => setFormData({...formData, reason: e.target.value})}
-                                    placeholder="Please explain why you need leave..."
-                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
-                                ></textarea>
-                            </div>
+                            {(!formData.courseId || !isSemesterCompleted) && (
+                                <>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-400 mb-2">From Date</label>
+                                            <input 
+                                                type="date" 
+                                                required
+                                                value={formData.startDate}
+                                                onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                                                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-400 mb-2">To Date</label>
+                                            <input 
+                                                type="date" 
+                                                required
+                                                value={formData.endDate}
+                                                onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                                                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                                            />
+                                        </div>
+                                    </div>
 
-                            <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/25">
-                                Submit Request
-                            </button>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-400 mb-2">Reason</label>
+                                        <textarea 
+                                            required
+                                            rows="4"
+                                            value={formData.reason}
+                                            onChange={(e) => setFormData({...formData, reason: e.target.value})}
+                                            placeholder="Please explain why you need leave..."
+                                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+                                        ></textarea>
+                                    </div>
+
+                                    <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/25">
+                                        Submit Request
+                                    </button>
+                                </>
+                            )}
                         </form>
                     </div>
                 )}

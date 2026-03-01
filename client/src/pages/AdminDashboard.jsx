@@ -46,6 +46,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         if (activeTab === 'courses') { fetchTeachers(); fetchSemesters(); }
         if (activeTab === 'enroll') { fetchCourses(); fetchStudents(); }
+        if (activeTab === 'semesters') { fetchSemesters(); }
     }, [activeTab]);
 
 
@@ -71,6 +72,7 @@ const AdminDashboard = () => {
             await api.post('/admin/semesters', semesterForm);
             setMsg({ type: 'success', text: 'Semester created successfully!' });
             setSemesterForm({ name: '', startDate: '', endDate: '' });
+            fetchSemesters(); // Refresh the list
         } catch (err) {
             setMsg({ type: 'error', text: err.response?.data?.message || 'Failed' });
         } finally { setLoading(false); }
@@ -104,8 +106,8 @@ const AdminDashboard = () => {
         <button
             onClick={() => { setActiveTab(id); setMsg({ type: '', text: '' }); }}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${activeTab === id
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                    : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'
                 }`}
         >
             <Icon size={18} /> {label}
@@ -140,7 +142,7 @@ const AdminDashboard = () => {
                 {/* Feedback */}
                 {msg.text && (
                     <div className={`p-4 rounded-xl border flex items-center gap-3 ${msg.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                            : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                        : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
                         }`}>
                         {msg.type === 'success' ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
                         {msg.text}
@@ -167,15 +169,67 @@ const AdminDashboard = () => {
                     )}
 
                     {activeTab === 'semesters' && (
-                        <form onSubmit={handleCreateSemester} className="space-y-4 sm:space-y-6">
-                            <h2 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2"><Calendar size={20} className="text-indigo-400" /> New Semester</h2>
-                            <div><label className="text-slate-400 text-[13px] sm:text-sm mb-1 block">Semester Name (e.g. Spring 2024)</label><input required className="input-field text-sm sm:text-base" value={semesterForm.name} onChange={e => setSemesterForm({ ...semesterForm, name: e.target.value })} type="text" /></div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                                <div><label className="text-slate-400 text-[13px] sm:text-sm mb-1 block">Start Date</label><input required className="input-field text-sm sm:text-base" value={semesterForm.startDate} onChange={e => setSemesterForm({ ...semesterForm, startDate: e.target.value })} type="date" /></div>
-                                <div><label className="text-slate-400 text-[13px] sm:text-sm mb-1 block">End Date</label><input required className="input-field text-sm sm:text-base" value={semesterForm.endDate} onChange={e => setSemesterForm({ ...semesterForm, endDate: e.target.value })} type="date" /></div>
+                        <div className="space-y-8">
+                            <form onSubmit={handleCreateSemester} className="space-y-4 sm:space-y-6 bg-slate-800/80 p-5 rounded-xl border border-slate-700/80">
+                                <h2 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2"><Calendar size={20} className="text-indigo-400" /> New Semester</h2>
+                                <div><label className="text-slate-400 text-[13px] sm:text-sm mb-1 block">Semester Name (e.g. Spring 2024)</label><input required className="input-field text-sm sm:text-base bg-slate-900" value={semesterForm.name} onChange={e => setSemesterForm({ ...semesterForm, name: e.target.value })} type="text" /></div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                                    <div><label className="text-slate-400 text-[13px] sm:text-sm mb-1 block">Start Date</label><input required className="input-field text-sm sm:text-base bg-slate-900" value={semesterForm.startDate} onChange={e => setSemesterForm({ ...semesterForm, startDate: e.target.value })} type="date" /></div>
+                                    <div><label className="text-slate-400 text-[13px] sm:text-sm mb-1 block">End Date</label><input required className="input-field text-sm sm:text-base bg-slate-900" value={semesterForm.endDate} onChange={e => setSemesterForm({ ...semesterForm, endDate: e.target.value })} type="date" /></div>
+                                </div>
+                                <button disabled={loading} type="submit" className="btn-primary w-full mt-2 sm:mt-0">{loading ? 'Creating...' : 'Create Semester'}</button>
+                            </form>
+
+                            <div className="pt-4 border-t border-slate-700/50">
+                                <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
+                                    <Calendar size={18} className="text-indigo-400" /> Existing Semesters ({semesters.length})
+                                </h3>
+
+                                {semesters.length === 0 ? (
+                                    <div className="text-center py-8 text-slate-500 bg-slate-800/30 rounded-xl border border-slate-700/30">
+                                        No semesters created yet.
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {semesters.map(semester => {
+                                            const now = new Date();
+                                            const start = new Date(semester.startDate);
+                                            const end = new Date(semester.endDate);
+
+                                            // Ensure end of day for end date comparison matching the backend fix
+                                            end.setHours(23, 59, 59, 999);
+
+                                            let status = 'Active';
+                                            let badgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+
+                                            if (now < start) {
+                                                status = 'Upcoming';
+                                                badgeClass = 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
+                                            } else if (now > end) {
+                                                status = 'Completed';
+                                                badgeClass = 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+                                            }
+
+                                            return (
+                                                <div key={semester._id} className="bg-slate-800/80 p-4 rounded-xl border border-slate-700/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                                    <div>
+                                                        <div className="flex items-center gap-3 mb-1">
+                                                            <h4 className="font-bold text-slate-200">{semester.name}</h4>
+                                                            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border ${badgeClass}`}>
+                                                                {status}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-slate-400">
+                                                            {new Date(semester.startDate).toLocaleDateString()} — {new Date(semester.endDate).toLocaleDateString()}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
-                            <button disabled={loading} type="submit" className="btn-primary w-full mt-2 sm:mt-0">{loading ? 'Creating...' : 'Create Semester'}</button>
-                        </form>
+                        </div>
                     )}
 
                     {activeTab === 'courses' && (
