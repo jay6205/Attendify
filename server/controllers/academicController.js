@@ -61,7 +61,7 @@ export const getAllCourses = async (req, res) => {
 
         const courses = await Course.find(query)
             .populate('teacher', 'name email details')
-            .populate('semester', 'name status');
+            .populate('semester', 'name status startDate endDate');
 
         res.json(courses);
     } catch (error) {
