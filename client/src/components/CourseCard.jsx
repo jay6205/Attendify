@@ -1,9 +1,9 @@
 import React from 'react';
 import Card from './Card';
-import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, User, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const CourseCard = ({ _id, name, code, attended, total, target = 75 }) => {
+const CourseCard = ({ _id, name, code, teacher, semester, attended, total, target = 75 }) => {
 
     // Calculations
     const percentage = total === 0 ? 0 : Math.round((attended / total) * 100);
@@ -59,6 +59,26 @@ const CourseCard = ({ _id, name, code, attended, total, target = 75 }) => {
                             {badgeText}
                         </span>
                         <span className="text-xs text-slate-400">{message}</span>
+                    </div>
+
+                    <div className="mt-4 space-y-1.5">
+                        {teacher && (
+                            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                                <User size={14} className="text-indigo-400" />
+                                <span className="font-medium text-slate-300">{teacher.name}</span>
+                            </div>
+                        )}
+                        {semester && (
+                            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                                <Calendar size={14} className="text-emerald-400" />
+                                <span>
+                                    <span className="font-medium text-slate-300">{semester.name}</span>
+                                    {semester.startDate && semester.endDate &&
+                                        <span className="text-slate-500"> • {new Date(semester.startDate).toLocaleDateString()} — {new Date(semester.endDate).toLocaleDateString()}</span>
+                                    }
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 
