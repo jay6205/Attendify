@@ -19,11 +19,13 @@ export const markAttendance = async (req, res) => {
 
         // 2. Validate Input
         if (!studentId || !courseId || !status) {
+            console.error("[markAttendance] Validation Failed (400): Missing required fields", { studentId, courseId, status });
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
         const validStatuses = ['Present', 'Absent', 'Leave'];
         if (!validStatuses.includes(status)) {
+            console.error("[markAttendance] Validation Failed (400): Invalid status", { status });
             return res.status(400).json({ message: 'Invalid status' });
         }
 
@@ -31,21 +33,25 @@ export const markAttendance = async (req, res) => {
         const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
         if (startTime || endTime) {
             if (!startTime || !endTime) {
+                console.error("[markAttendance] Validation Failed (400): Both startTime and endTime are required", { startTime, endTime });
                 return res.status(400).json({ message: 'Both startTime and endTime are required if one is provided' });
             }
             if (!TIME_REGEX.test(startTime) || !TIME_REGEX.test(endTime)) {
+                console.error("[markAttendance] Validation Failed (400): Invalid time format", { startTime, endTime });
                 return res.status(400).json({ message: 'Invalid time format. Use HH:mm (e.g. 09:00)' });
             }
             // Convert to minutes to compare
             const [sH, sM] = startTime.split(':').map(Number);
             const [eH, eM] = endTime.split(':').map(Number);
             if (sH * 60 + sM >= eH * 60 + eM) {
+                console.error("[markAttendance] Validation Failed (400): startTime must be before endTime", { startTime, endTime });
                 return res.status(400).json({ message: 'startTime must be before endTime' });
             }
         }
 
         const attendanceDate = date ? new Date(date) : new Date();
         if (isNaN(attendanceDate.getTime())) {
+            console.error("[markAttendance] Validation Failed (400): Invalid date format", { date });
             return res.status(400).json({ message: 'Invalid date format' });
         }
         // Normalize date to remove time component for consistent unique checks
@@ -63,12 +69,14 @@ export const markAttendance = async (req, res) => {
 
         // 4. Verify Student Enrollment
         if (!course.students.some(s => s.toString() === studentId)) {
+            console.error("[markAttendance] Validation Failed (400): Student is not enrolled in this course", { studentId, courseId });
             return res.status(400).json({ message: 'Student is not enrolled in this course' });
         }
 
         // 5. Verify Semester Date Range
         const semester = course.semester;
         if (!semester) {
+             console.error("[markAttendance] Validation Failed (400): Course is not linked to a valid semester", { courseId });
              return res.status(400).json({ message: 'Course is not linked to a valid semester' });
         }
         
@@ -77,8 +85,14 @@ export const markAttendance = async (req, res) => {
         
         const semEnd = new Date(semester.endDate);
         semEnd.setHours(23, 59, 59, 999);
+
+        if (isNaN(semStart.getTime()) || isNaN(semEnd.getTime())) {
+            console.error("[markAttendance] Validation Failed (400): Semester has invalid start or end date", { semStart, semEnd, semester });
+            return res.status(400).json({ message: 'Semester has invalid start or end date' });
+        }
         
         if (attendanceDate.getTime() < semStart.getTime() || attendanceDate.getTime() > semEnd.getTime()) {
+            console.error("[markAttendance] Validation Failed (400): Date is outside the semester duration", { attendanceDate, semStart, semEnd });
             return res.status(400).json({ message: 'Date is outside the semester duration' });
         }
 
