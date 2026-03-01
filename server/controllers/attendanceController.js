@@ -72,7 +72,13 @@ export const markAttendance = async (req, res) => {
              return res.status(400).json({ message: 'Course is not linked to a valid semester' });
         }
         
-        if (attendanceDate < new Date(semester.startDate) || attendanceDate > new Date(semester.endDate)) {
+        const semStart = new Date(semester.startDate);
+        semStart.setHours(0, 0, 0, 0);
+        
+        const semEnd = new Date(semester.endDate);
+        semEnd.setHours(23, 59, 59, 999);
+        
+        if (attendanceDate.getTime() < semStart.getTime() || attendanceDate.getTime() > semEnd.getTime()) {
             return res.status(400).json({ message: 'Date is outside the semester duration' });
         }
 
