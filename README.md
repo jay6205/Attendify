@@ -1,6 +1,6 @@
 # Attendify – Smart Attendance Manager
 
-Attendify is an AI-powered student attendance management system built using the MERN stack. It helps students track attendance, calculate safe bunks, extract timetables via OCR, and gain actionable academic insights through an intelligent assistant.
+Attendify is an AI-powered student attendance management system built using the MERN stack. It helps students track attendance, extract timetables via OCR, and gain actionable academic insights through an intelligent assistant.
 
 Demo Link:https://attendify-roan.vercel.app/
 ---
@@ -19,7 +19,7 @@ Demo Link:https://attendify-roan.vercel.app/
   - **Smart Insights**: Personalized recommendations based on attendance history
 
 - 📊 **Advanced Analytics**
-  - **Smart Dashboard**: Real-time attendance overview with safe bunk calculations
+  - **Smart Dashboard**: Real-time attendance overview
   - **Interactive Charts**: Subject-wise attendance and trend analysis
   - **Attendance Heatmap**: GitHub-style visualization of attendance frequency
 
@@ -147,7 +147,6 @@ Attendify/
 ## Usage
 
 ### 1. Dashboard
-- View your "Safe Bunks" at a glance.
 - Use the **+** button to add manual subjects.
 - Use the **Check/Cross** buttons on cards for quick attendance marking.
 

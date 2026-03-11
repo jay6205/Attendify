@@ -10,8 +10,8 @@ export const validateResponse = (responseText, truthObject) => {
 
     // 1. Banned Phrases (Anti-Institutional)
     const bannedPhrases = [
-        "bunk", "skip class", "evade", "cheat", "ignore compliance", 
-        "don't worry about attendance", "optimize for 75"
+        "cheat", "ignore compliance", 
+        "don't worry about attendance"
     ];
 
     for (const phrase of bannedPhrases) {

@@ -76,11 +76,10 @@ const StudentDashboard = () => {
 
     // Helper to calculate summary stats
     const calculateStats = () => {
-        if (!courses.length) return { avg: 0, totalClasses: 0, bunkable: 0, critical: 0 };
+        if (!courses.length) return { avg: 0, totalClasses: 0, critical: 0 };
 
         let totalPct = 0;
         let totalClasses = 0;
-        let bunkable = 0;
         let critical = 0;
         let countedCourses = 0;
 
@@ -93,11 +92,7 @@ const StudentDashboard = () => {
             totalClasses += sub.total;
 
             const target = user?.attendanceRequirement || 75;
-            if (pct >= target) {
-                const possibleTotal = sub.attended / (target / 100);
-                const safe = Math.floor(possibleTotal - sub.total);
-                if (safe > 0) bunkable += safe;
-            } else {
+            if (pct < target) {
                 critical++;
             }
         });
@@ -105,7 +100,6 @@ const StudentDashboard = () => {
         return {
             avg: countedCourses > 0 ? Math.round(totalPct / countedCourses) : 0,
             totalClasses,
-            bunkable,
             critical
         };
     };
@@ -172,7 +166,7 @@ const StudentDashboard = () => {
                 ) : (
                     <>
                         {/* Stats Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             <StatCard
                                 label="Avg Attendance"
                                 value={`${stats.avg}%`}
@@ -183,12 +177,6 @@ const StudentDashboard = () => {
                                 label="Total Classes"
                                 value={stats.totalClasses}
                                 color="text-indigo-400"
-                            />
-                            <StatCard
-                                label="Safe Bunks"
-                                value={stats.bunkable}
-                                icon="🏖️"
-                                color="text-emerald-400"
                             />
                             <StatCard
                                 label="Critical"

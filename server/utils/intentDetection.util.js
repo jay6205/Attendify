@@ -7,9 +7,9 @@ export const detectIntent = (message) => {
     if (!message) return 'GENERAL';
     const lowerMsg = message.toLowerCase();
 
-    // 1. Risk / Bunking / Skipping
-    // "Can I skip?", "Is it safe to bunk?", "How many misses left?"
-    if (lowerMsg.match(/(skip|bunk|miss|safe|risk|warning|danger|fail|detain)/)) {
+    // 1. Risk / Warning
+    // "How many misses left?"
+    if (lowerMsg.match(/(miss|risk|warning|danger|fail|detain)/)) {
         return 'RISK_QUESTION';
     }
 
