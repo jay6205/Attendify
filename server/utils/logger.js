@@ -34,14 +34,66 @@ const level = () => {
     return isDevelopment ? 'debug' : 'info';
 };
 
+import 'winston-daily-rotate-file';
+
+// Setup Daily Rotate File Transports
+const errorTransport = new winston.transports.DailyRotateFile({
+    filename: 'logs/error-%DATE%.log',
+    datePattern: 'YYYY-MM-DD',
+    zippedArchive: true,
+    maxSize: '5m',
+    maxFiles: '14d',
+    level: 'error',
+});
+
+const combinedTransport = new winston.transports.DailyRotateFile({
+    filename: 'logs/combined-%DATE%.log',
+    datePattern: 'YYYY-MM-DD',
+    zippedArchive: true,
+    maxSize: '10m',
+    maxFiles: '14d',
+});
+
+const exceptionTransport = new winston.transports.DailyRotateFile({
+    filename: 'logs/exceptions-%DATE%.log',
+    datePattern: 'YYYY-MM-DD',
+    zippedArchive: true,
+    maxSize: '5m',
+    maxFiles: '14d',
+});
+
+const rejectionTransport = new winston.transports.DailyRotateFile({
+    filename: 'logs/rejections-%DATE%.log',
+    datePattern: 'YYYY-MM-DD',
+    zippedArchive: true,
+    maxSize: '5m',
+    maxFiles: '14d',
+});
+
+const transports = [
+    new winston.transports.Console({
+        format: consoleFormat,
+    })
+];
+
+const env = process.env.NODE_ENV || 'development';
+if (env === 'production') {
+    transports.push(errorTransport);
+    transports.push(combinedTransport);
+}
+
 const logger = winston.createLogger({
     level: level(),
     levels,
     format: fileFormat,
-    transports: [
-        new winston.transports.Console({
-            format: consoleFormat,
-        })
+    transports,
+    exceptionHandlers: [
+        new winston.transports.Console({ format: consoleFormat }),
+        ...(env === 'production' ? [exceptionTransport] : [])
+    ],
+    rejectionHandlers: [
+        new winston.transports.Console({ format: consoleFormat }),
+        ...(env === 'production' ? [rejectionTransport] : [])
     ],
 });
 
