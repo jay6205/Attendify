@@ -24,8 +24,8 @@ const app = express();
 app.set('trust proxy', 1);
 
 // Root-level health ping — mounted before all middleware for UptimeRobot / monitoring
-// No rate limiting, no CORS, no auth — fastest possible response
-app.get('/health', getPing);
+// No rate limiting, no auth — fastest possible response. Allowed for CORS so frontend can ping.
+app.get('/health', cors(), getPing);
 
 // Logging Middleware
 if (process.env.NODE_ENV === 'development') {
