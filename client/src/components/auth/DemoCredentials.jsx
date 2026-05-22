@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, User, Shield, ArrowRight } from 'lucide-react';
+import { Zap, User, Shield, BookOpen, Users, ArrowRight } from 'lucide-react';
 
 const DEMO_ACCOUNTS = [
     {
@@ -24,6 +24,28 @@ const DEMO_ACCOUNTS = [
         borderColor: 'border-rose-500/20',
         description: 'Manage teachers, courses, semesters & enrollment',
         portal: 'admin',
+    },
+    {
+        role: 'Teacher',
+        email: 'teacher@demo.com',
+        password: 'demo123',
+        icon: BookOpen,
+        gradient: 'from-emerald-500 to-teal-500',
+        bgGlow: 'shadow-emerald-500/10',
+        borderColor: 'border-emerald-500/20',
+        description: 'Manage attendance, enter marks, and approve leaves',
+        portal: 'teacher',
+    },
+    {
+        role: 'Parent',
+        email: 'parent@demo.com',
+        password: 'demo123',
+        icon: Users,
+        gradient: 'from-amber-500 to-yellow-500',
+        bgGlow: 'shadow-amber-500/10',
+        borderColor: 'border-amber-500/20',
+        description: "View your child's performance and attendance analytics",
+        portal: 'parent',
     },
 ];
 

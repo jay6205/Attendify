@@ -20,7 +20,9 @@ Visit **[https://attendify-roan.vercel.app/](https://attendify-roan.vercel.app/)
 | Role | Email | Password | Portal |
 |------|-------|----------|--------|
 | **Student** | `student@demo.com` | `demo123` | [Student Login](https://attendify-roan.vercel.app/login/student) |
+| **Teacher** | `teacher@demo.com` | `demo123` | [Teacher Login](https://attendify-roan.vercel.app/login/teacher) |
 | **Admin** | `admin@demo.com` | `demo123` | [Admin Login](https://attendify-roan.vercel.app/login/admin) |
+| **Parent** | `parent@demo.com` | `demo123` | [Parent Login](https://attendify-roan.vercel.app/login/parent) |
 
 > 💡 **Tip:** Click the **"Quick Demo Access"** button on the login page to auto-fill credentials with one click.
 
