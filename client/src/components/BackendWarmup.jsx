@@ -58,17 +58,14 @@ const BackendWarmup = ({ children }) => {
                         >
                             Retry
                         </button>
-                        <button
-                            onClick={() => {
-                                // Force render children by dispatching a custom event
-                                const event = new CustomEvent('force-proceed');
-                                window.dispatchEvent(event);
-                                window.location.reload();
-                            }}
-                            className="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg font-medium transition-colors"
-                        >
-                            Proceed Anyway
-                        </button>
+<button
+    onClick={() => {
+        window.location.reload();
+    }}
+    className="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg font-medium transition-colors"
+>
+    Proceed Anyway
+</button>
                     </div>
                 </motion.div>
             </AnimatePresence>
@@ -152,7 +149,7 @@ const BackendWarmup = ({ children }) => {
 
                     {/* Subtle helper text */}
                     <p className="text-slate-600 text-xs">
-                        Free-tier backend warming up • ~15–30 seconds
+                        Free-tier backend warming up • may take up to 60 seconds
                     </p>
                 </div>
             </motion.div>
