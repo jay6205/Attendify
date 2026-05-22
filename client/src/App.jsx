@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import BackendWarmup from './components/BackendWarmup';
 
 import MainLayout from './layouts/MainLayout';
 import StudentDashboard from './pages/StudentDashboard';
@@ -43,10 +44,11 @@ import AlertListPage from './components/alerts/AlertListPage';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Public Routes */}
+    <BackendWarmup>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Public Routes */}
           <Route path="/login/student" element={<Login expectedRole="student" portalName="Student Portal" />} />
           <Route path="/login/teacher" element={<Login expectedRole="teacher" portalName="Faculty Portal" />} />
           <Route path="/login/admin" element={<Login expectedRole="admin" portalName="Admin Portal" />} />
@@ -212,9 +214,10 @@ function App() {
           {/* Unauthorized / 404 */}
           <Route path="/unauthorized" element={<div className="text-white p-10">Unauthorized Access</div>} />
           <Route path="*" element={<Navigate to="/login/student" />} />
-        </Routes>
-      </Router>
-    </AuthProvider >
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </BackendWarmup>
   );
 }
 

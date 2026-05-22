@@ -10,6 +10,7 @@ import { globalLimiter, authLimiter, chatLimiter } from './middleware/rateLimite
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import logger from './utils/logger.js';
 import { startTelegramBot } from './scripts/telegramBot.js';
+import { getPing } from './controllers/healthController.js';
 
 // Load env vars
 dotenv.config();
@@ -21,6 +22,10 @@ const app = express();
 
 // Trust reverse proxy (if deployed behind Nginx, Render, Heroku)
 app.set('trust proxy', 1);
+
+// Root-level health ping — mounted before all middleware for UptimeRobot / monitoring
+// No rate limiting, no CORS, no auth — fastest possible response
+app.get('/health', getPing);
 
 // Logging Middleware
 if (process.env.NODE_ENV === 'development') {

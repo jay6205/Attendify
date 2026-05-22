@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import DemoCredentials from '../components/auth/DemoCredentials';
 import { LogIn, AlertCircle } from 'lucide-react';
 
 const Login = ({ expectedRole = 'student', portalName = 'Student Portal' }) => {
@@ -45,6 +46,12 @@ const Login = ({ expectedRole = 'student', portalName = 'Student Portal' }) => {
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');
         }
+    };
+
+    const handleDemoSelect = (demoEmail, demoPassword) => {
+        setEmail(demoEmail);
+        setPassword(demoPassword);
+        setError('');
     };
 
     const getPortalColor = () => {
@@ -108,6 +115,12 @@ const Login = ({ expectedRole = 'student', portalName = 'Student Portal' }) => {
                         Sign In
                     </button>
                 </form>
+
+                {/* Demo Credentials — shown for Student and Admin portals */}
+                <DemoCredentials
+                    onSelectCredential={handleDemoSelect}
+                    expectedRole={expectedRole}
+                />
 
                 {/* Portal Switcher */}
                 <div className="mt-6 pt-6 border-t border-slate-700/50 space-y-2">

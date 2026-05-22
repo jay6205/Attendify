@@ -3,6 +3,7 @@ import { Plus, UserPlus, BookOpen, Calendar, Users, Save, CheckCircle, AlertTria
 import api from '../api/axios';
 import AuthContext from '../context/AuthContext';
 import PageTransition from '../components/PageTransition';
+import WelcomeBanner from '../components/WelcomeBanner';
 
 const AdminDashboard = () => {
     const { user } = useContext(AuthContext);
@@ -117,6 +118,9 @@ const AdminDashboard = () => {
     return (
         <PageTransition>
             <div className="space-y-8 pb-20">
+                {/* Welcome Banner for first-time visitors */}
+                <WelcomeBanner />
+
                 <header className="flex flex-col gap-2">
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent mb-1">
                         Admin Portal

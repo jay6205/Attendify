@@ -8,6 +8,7 @@ import SkeletonCard from '../components/SkeletonCard';
 import StudentActiveSessionCard from '../components/StudentActiveSessionCard';
 import FeedbackBanner from '../components/feedback/FeedbackBanner';
 import AchievementShowcase from '../components/achievements/AchievementShowcase';
+import WelcomeBanner from '../components/WelcomeBanner';
 import { LayoutDashboard, BookOpen, AlertCircle } from 'lucide-react';
 
 // Stat Card Component
@@ -120,6 +121,9 @@ const StudentDashboard = () => {
     return (
         <PageTransition>
             <div className="space-y-8 pb-20">
+                {/* Welcome Banner for first-time visitors */}
+                <WelcomeBanner />
+
                 {/* Header */}
                 <header className="flex justify-between items-end">
                     <div>

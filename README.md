@@ -6,8 +6,84 @@ Attendify is a multi-tenant, AI-powered academic management system built on the 
 
 ---
 
+## 🚀 Quick Start for Recruiters
+
+> **Evaluate the full application in under 2 minutes.** No signup required — demo accounts are pre-configured.
+
+### Step 1: Open the App
+Visit **[https://attendify-roan.vercel.app/](https://attendify-roan.vercel.app/)**
+
+> ⏳ **Note:** The backend is hosted on Render's free tier. If this is the first visit in a while, you'll see a branded "Waking up the server..." loading screen. This takes ~15–30 seconds. The app will automatically proceed once the server is ready.
+
+### Step 2: Login with Demo Credentials
+
+| Role | Email | Password | Portal |
+|------|-------|----------|--------|
+| **Student** | `student@demo.com` | `demo123` | [Student Login](https://attendify-roan.vercel.app/login/student) |
+| **Admin** | `admin@demo.com` | `demo123` | [Admin Login](https://attendify-roan.vercel.app/login/admin) |
+
+> 💡 **Tip:** Click the **"Quick Demo Access"** button on the login page to auto-fill credentials with one click.
+
+### Step 3: Explore Key Features
+
+**As Student:**
+1. 📋 **Dashboard** — View enrolled courses, attendance %, and active AI sessions
+2. 🏆 **Achievements** — See gamification badges and XP progression
+3. 📊 **Marks** — View assessment results with distribution charts and analytics
+4. 🤖 **AI Advisor** — Chat with the AI assistant (powered by Google Gemini)
+5. 📈 **Performance** — Personal attendance trends and academic overview
+6. 📝 **Leaves** — Submit and track leave requests
+
+**As Admin:**
+1. 📋 **Dashboard** — Manage teachers, courses, semesters, and student enrollment
+2. 📊 **Performance** — Institute-wide, course-level, and individual student analytics
+3. 💬 **Feedback** — Create feedback forms and view aggregated summaries
+
+### Step 4: What to Notice
+
+| Category | What to Look For |
+|----------|-----------------|
+| 🎨 **UI/UX** | Glassmorphism dark theme, Framer Motion page transitions, skeleton loaders, micro-interactions |
+| 🤖 **AI Integration** | AI-verified attendance sessions, Gemini-powered chatbot with guardrails, AI question paper generation |
+| 📊 **Analytics** | Recharts visualizations, marks distribution, attendance trends, percentile rankings |
+| 🏆 **Gamification** | XP system, achievement badges, assessment leaderboards with confetti celebrations |
+| 🔐 **Architecture** | Multi-tenant RBAC, organization-scoped data isolation, JWT auth, tiered rate limiting |
+| 📱 **Responsive** | Fully responsive across mobile, tablet, and desktop viewports |
+
+---
+
+## 🗺️ How to Navigate the App
+
+### Student Portal
+| Sidebar Item | What It Does |
+|-------------|-------------|
+| Dashboard | Course overview, attendance stats, AI session cards, feedback banners |
+| Achievements | XP tracker, earned badges, gamification progress |
+| My Marks | Assessment results, marks analytics with charts |
+| Performance | Personal attendance trends, course-wise breakdown |
+| My Leaves | Submit leave requests, track approval status |
+| AI Advisor | Gemini-powered academic chatbot |
+| Settings | Profile, Telegram integration, account preferences |
+
+### Admin Portal
+| Sidebar Item | What It Does |
+|-------------|-------------|
+| Dashboard | Create teachers, semesters, courses; enroll students |
+| Performance | Institute-wide analytics, course and student drill-down |
+| Create Feedback | Build feedback forms for courses or assessments |
+| Feedback Summary | View aggregated feedback responses |
+
+### Additional Portals
+- **Teacher Portal** (`/login/teacher`) — Attendance management (manual + AI sessions), marks entry, analytics, leave approvals, question paper builder
+- **Parent Portal** (`/login/parent`) — Read-only view of student dashboard and performance
+- **Super Admin Portal** (via Admin login) — Organization and admin management, platform-wide usage metrics
+
+---
+
 ## Table of Contents
 
+- [Quick Start for Recruiters](#-quick-start-for-recruiters)
+- [How to Navigate the App](#️-how-to-navigate-the-app)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Architecture Overview](#architecture-overview)
